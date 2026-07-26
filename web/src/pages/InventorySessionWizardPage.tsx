@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { BoxConfirmActions } from "../components/BoxConfirmActions";
 import { MedicationFields } from "../components/MedicationFields";
 import { PhotoThumbnails } from "../components/PhotoThumbnails";
+import { QuantityBar } from "../components/QuantityBar";
 import { useAuth } from "../lib/auth";
 import {
   addDetectedBox,
@@ -75,6 +76,78 @@ export function InventorySessionWizardPage() {
       <p className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
         Sessione di inventario non trovata.
       </p>
+    );
+  }
+
+  if (session.status === "completed") {
+    const newCount = boxes.filter((b) => b.status === "confirmed").length;
+    const mergedCount = boxes.filter((b) => b.status === "merged_into_existing").length;
+    const unresolvedCount = boxes.length - newCount - mergedCount;
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-800">Sessione di inventario</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {session.startedAt?.toDate().toLocaleDateString("it-IT") ?? "…"}
+            {" – "}
+            {session.completedAt?.toDate().toLocaleDateString("it-IT") ?? "…"}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3 text-sm">
+          <span className="rounded-full bg-emerald-100 px-3 py-1 font-medium text-emerald-800">
+            {newCount} nuovi farmaci
+          </span>
+          <span className="rounded-full bg-teal-100 px-3 py-1 font-medium text-teal-800">
+            {mergedCount} farmaci aggiornati
+          </span>
+          {unresolvedCount > 0 && (
+            <span className="rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-600">
+              {unresolvedCount} non completati
+            </span>
+          )}
+        </div>
+
+        <ul className="space-y-2">
+          {boxes.length === 0 && (
+            <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500">
+              Nessuna confezione registrata in questa sessione.
+            </p>
+          )}
+          {boxes.map((box) => (
+            <li
+              key={box.id}
+              className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4"
+            >
+              <div>
+                <p className="font-medium text-slate-800">
+                  {box.classification?.name || box.label}
+                </p>
+                <p className="text-xs text-slate-500">
+                  {box.classification?.producer || "Produttore sconosciuto"} ·{" "}
+                  {STATUS_LABELS[box.status]}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-3">
+                {box.classification && (
+                  <div className="w-28">
+                    <QuantityBar percent={box.classification.quantityPercent} />
+                  </div>
+                )}
+                {box.medicationId && (
+                  <Link
+                    to={`/farmaci/${box.medicationId}`}
+                    className="text-xs font-medium text-teal-700 hover:underline"
+                  >
+                    Vedi farmaco
+                  </Link>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     );
   }
 
@@ -199,11 +272,11 @@ export function InventorySessionWizardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-800">Sessione di inventario</h1>
         <button
-          disabled={busy || session.status === "completed"}
+          disabled={busy}
           onClick={() => sessionId && void completeInventorySession(sessionId)}
           className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
         >
-          {session.status === "completed" ? "Sessione conclusa" : "Termina sessione"}
+          Termina sessione
         </button>
       </div>
 

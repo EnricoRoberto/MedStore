@@ -45,6 +45,14 @@ const sections: Section[] = [
     status: "Disponibile dalla Milestone 3.",
   },
   {
+    title: "Storico degli inventari",
+    body: [
+      "La sezione Inventario elenca tutte le sessioni di rilevazione svolte nel tempo, in corso o concluse.",
+      "Aprendo una sessione conclusa vedi un riepilogo: quanti farmaci nuovi sono stati censiti, quanti aggiornati e la quantità registrata per ciascuno in quella rilevazione, per confrontare la situazione tra un controllo e l'altro.",
+    ],
+    status: "Disponibile dalla Milestone 6.",
+  },
+  {
     title: "Notifiche",
     body: [
       "MedStore invia notifiche push quando un farmaco sta per scadere o la quantità residua sta per esaurirsi, in base alle soglie configurate.",

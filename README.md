@@ -50,7 +50,7 @@ Una volta completati questi passi, ogni push su `main` esegue automaticamente bu
 - [x] M3 — CRUD farmaci, ricerca, barra quantità, change log
 - [x] M4 — Wizard foto con classificazione stub (inserimento manuale)
 - [x] M5 — Classificazione reale con Gemini (Vertex AI in Firebase) + conferma manuale
-- [ ] M6 — Storicizzazione inventario
+- [x] M6 — Storicizzazione inventario
 - [ ] M7 — Notifiche push (FCM) + funzione schedulata
 - [ ] M8 — Pagina statistiche/report
 - [ ] M9 — Rifinitura PWA, manuale utente completo, hardening CI/rules
