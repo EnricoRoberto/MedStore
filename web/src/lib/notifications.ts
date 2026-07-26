@@ -1,6 +1,7 @@
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { getMessaging, getToken, isSupported } from "firebase/messaging";
-import { app, db, firebaseConfig } from "./firebase";
+import { app, db } from "./firebase";
+import { registerServiceWorker } from "./serviceWorker";
 
 export type NotificationSetupResult = "granted" | "denied" | "unsupported";
 
@@ -14,15 +15,10 @@ export async function enablePushNotifications(uid: string): Promise<Notification
     return "denied";
   }
 
-  const swParams = new URLSearchParams(
-    Object.entries(firebaseConfig).reduce<Record<string, string>>((acc, [key, value]) => {
-      acc[key] = String(value ?? "");
-      return acc;
-    }, {}),
-  );
-  const registration = await navigator.serviceWorker.register(
-    `/firebase-messaging-sw.js?${swParams.toString()}`,
-  );
+  const registration = await registerServiceWorker();
+  if (!registration) {
+    return "unsupported";
+  }
 
   const messaging = getMessaging(app);
   const token = await getToken(messaging, {

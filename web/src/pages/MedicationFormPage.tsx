@@ -83,9 +83,18 @@ export function MedicationFormPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-slate-800">
-        {isNew ? "Nuovo farmaco" : form.name || "Modifica farmaco"}
-      </h1>
+      <div>
+        <h1 className="text-xl font-semibold text-slate-800">
+          {isNew ? "Nuovo farmaco" : form.name || "Modifica farmaco"}
+        </h1>
+        {existing?.lastModifiedBy && (
+          <p className="mt-1 text-xs text-slate-500">
+            Ultima modifica di {existing.lastModifiedBy}
+            {existing.lastModifiedAt &&
+              ` il ${existing.lastModifiedAt.toDate().toLocaleString("it-IT")}`}
+          </p>
+        )}
+      </div>
 
       <form
         onSubmit={(event) => void handleSubmit(event)}

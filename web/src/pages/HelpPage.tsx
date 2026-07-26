@@ -1,7 +1,6 @@
 interface Section {
   title: string;
   body: string[];
-  status?: string;
 }
 
 const sections: Section[] = [
@@ -15,57 +14,62 @@ const sections: Section[] = [
   {
     title: "Acquisizione tramite foto",
     body: [
-      "Disponi le confezioni su un tavolo e scatta una prima foto d'insieme di tutto il gruppo.",
+      "Dalla sezione Inventario avvia una nuova sessione, disponi le confezioni su un tavolo e scatta una prima foto d'insieme di tutto il gruppo.",
       "Gira le scatole per mostrare gli altri lati (marca, produttore, data di scadenza) e scatta altre foto dello stesso gruppo.",
-      "Il wizard segnala le confezioni non ancora classificabili e ti guida a scattare foto mirate aggiuntive finché non sono tutte riconosciute o confermate manualmente.",
+      "Premi \"Classifica con IA\" per far analizzare le foto: il sistema individua le confezioni, correla le foto che mostrano la stessa scatola da angolazioni diverse ed estrae produttore, nome, principio attivo, destinazione d'uso, obbligo di ricetta e scadenza, con un livello di confidenza.",
+      "Le confezioni con confidenza bassa o non riconosciute restano segnalate: scatta una foto mirata aggiuntiva per quella specifica confezione, oppure classificala e completane i dati manualmente. Puoi anche aggiungere una confezione a mano in qualsiasi momento se l'IA non la individua.",
+      "Per ogni confezione classificata, conferma se è un farmaco nuovo o l'aggiornamento di uno già censito (in questo caso ne aggiorna quantità e dati) prima che entri in inventario.",
+      "Puoi terminare la sessione in qualsiasi momento, anche con alcune confezioni non completate: resteranno segnalate ma la sessione diventa un riepilogo di sola lettura consultabile in seguito.",
     ],
-    status: "Disponibile dalla Milestone 4 (bozza) e Milestone 5 (classificazione IA reale).",
   },
   {
     title: "Classificazione di ogni farmaco",
     body: [
-      "Per ogni farmaco vengono registrati: produttore, nome, principio attivo, destinazione d'uso, obbligo o meno di ricetta medica, e i tag con i nomi delle persone che lo usano (inseriti manualmente a fine classificazione).",
-      "Puoi correggere in qualsiasi momento questi dati cercando o selezionando il farmaco.",
+      "Per ogni farmaco vengono registrati: produttore, nome, principio attivo, destinazione d'uso, obbligo o meno di ricetta medica, e i tag con i nomi delle persone che lo usano.",
+      "Puoi correggere questi dati in qualsiasi momento cercando o selezionando il farmaco dalla schermata principale.",
+      "Un farmaco non si elimina mai: quando non è più in casa, impostane lo stato su \"Archiviato\" per toglierlo dall'uso corrente mantenendo comunque lo storico.",
     ],
-    status: "Disponibile dalla Milestone 3.",
   },
   {
     title: "Giacenza e ricerca",
     body: [
-      "Ogni farmaco ha una quantità indicativa da 0% a 100%, mostrata con una barra colorata (verde-giallo-rosso in base al livello) e modificabile manualmente in qualsiasi momento.",
-      "Usa la ricerca per trovare rapidamente un farmaco e verificarne la giacenza attuale.",
+      "Ogni farmaco ha una quantità indicativa da 0% a 100%, mostrata con una barra colorata (verde, giallo sotto il 20%, rosso sotto il 5%) e modificabile manualmente in qualsiasi momento.",
+      "Usa la barra di ricerca nella schermata principale per trovare rapidamente un farmaco per nome, produttore, principio attivo o tag, e verificarne la giacenza.",
     ],
-    status: "Disponibile dalla Milestone 3.",
   },
   {
     title: "Storico delle modifiche",
     body: [
-      "Ogni modifica ai dati di un farmaco (quantità, tag, scadenza, ecc.) viene registrata in un log con data e utente che l'ha effettuata, visibile dalla scheda del farmaco.",
+      "Ogni modifica ai dati di un farmaco (quantità, tag, scadenza, ecc.) viene registrata in un log con data e utente che l'ha effettuata, visibile in fondo alla scheda del farmaco.",
+      "La scheda del farmaco mostra anche chi lo ha modificato per ultimo e quando.",
     ],
-    status: "Disponibile dalla Milestone 3.",
   },
   {
     title: "Storico degli inventari",
     body: [
       "La sezione Inventario elenca tutte le sessioni di rilevazione svolte nel tempo, in corso o concluse.",
-      "Aprendo una sessione conclusa vedi un riepilogo: quanti farmaci nuovi sono stati censiti, quanti aggiornati e la quantità registrata per ciascuno in quella rilevazione, per confrontare la situazione tra un controllo e l'altro.",
+      "Aprendo una sessione conclusa vedi un riepilogo: quanti farmaci nuovi sono stati censiti, quanti aggiornati, e la quantità registrata per ciascuno in quella rilevazione, utile per confrontare la situazione tra un controllo e l'altro.",
     ],
-    status: "Disponibile dalla Milestone 6.",
   },
   {
     title: "Notifiche",
     body: [
       "MedStore invia notifiche push quando un farmaco sta per scadere, la quantità residua sta per esaurirsi o è esaurita, in base a soglie configurabili (default: entro 30 giorni dalla scadenza, quantità bassa sotto il 20%, esaurita sotto il 5%).",
-      "Attivale con il pulsante 🔔 in alto nella pagina: il browser chiederà il permesso di mostrare notifiche.",
+      "Attivale con il pulsante 🔔 in alto nella pagina: il browser chiederà il permesso di mostrare notifiche. Una volta attive restano tali finché non revochi il permesso dalle impostazioni del browser.",
+      "Ogni condizione (scadenza, scorta bassa, esaurito) viene notificata una sola volta finché resta vera, per evitare notifiche ripetute ogni giorno.",
     ],
-    status: "Disponibile dalla Milestone 7.",
   },
   {
     title: "Statistiche",
     body: [
       "La pagina Statistiche riassume l'inventario: numero di farmaci in uso e archiviati, da banco vs con ricetta, in scadenza o scaduti, con scorta bassa o esauriti, sessioni di inventario completate e quanti farmaci usa ciascuna persona.",
     ],
-    status: "Disponibile dalla Milestone 8.",
+  },
+  {
+    title: "Installazione come app",
+    body: [
+      "MedStore è una PWA: dal browser dello smartphone puoi \"Aggiungi a schermata Home\" per usarla come un'app, con icona propria e funzionamento offline per le pagine già visitate.",
+    ],
   },
   {
     title: "Accesso",
@@ -90,11 +94,6 @@ export function HelpPage() {
               <p key={paragraph}>{paragraph}</p>
             ))}
           </div>
-          {section.status && (
-            <p className="mt-3 text-xs font-medium uppercase tracking-wide text-teal-600">
-              {section.status}
-            </p>
-          )}
         </section>
       ))}
     </div>

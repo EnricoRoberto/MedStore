@@ -7,6 +7,37 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.allowlisted == true;
     }
 
+    function isValidMedication(data) {
+      return data.name is string && data.name.size() > 0
+        && data.producer is string
+        && data.activeIngredient is string
+        && data.indication is string
+        && data.requiresPrescription is bool
+        && data.tags is list
+        && data.quantityPercent is number
+        && data.quantityPercent >= 0 && data.quantityPercent <= 100
+        && data.status in ['active', 'archived']
+        && (data.expirationDate == null || data.expirationDate is string)
+        && data.photoRefs is list
+        && data.lastModifiedBy is string;
+    }
+
+    function isValidInventorySession(data) {
+      return data.status in ['in_progress', 'completed'];
+    }
+
+    function isValidSessionPhoto(data) {
+      return data.type in ['general', 'rotation', 'targeted']
+        && data.storagePath is string;
+    }
+
+    function isValidDetectedBox(data) {
+      return data.label is string
+        && data.photoIds is list
+        && data.status in
+          ['unclassified', 'needs_more_photos', 'classified', 'confirmed', 'merged_into_existing'];
+    }
+
     match /allowlist/{email} {
       // Managed only from the Firebase console / Admin SDK, never from the client.
       allow read, write: if false;
@@ -18,7 +49,8 @@ service cloud.firestore {
     }
 
     match /medications/{medicationId} {
-      allow read, create, update: if isAllowlisted();
+      allow read: if isAllowlisted();
+      allow create, update: if isAllowlisted() && isValidMedication(request.resource.data);
       allow delete: if false;
 
       match /changeLog/{logId} {
@@ -29,16 +61,19 @@ service cloud.firestore {
     }
 
     match /inventorySessions/{sessionId} {
-      allow read, create, update: if isAllowlisted();
+      allow read: if isAllowlisted();
+      allow create, update: if isAllowlisted() && isValidInventorySession(request.resource.data);
       allow delete: if false;
 
       match /photos/{photoId} {
-        allow read, create: if isAllowlisted();
+        allow read: if isAllowlisted();
+        allow create: if isAllowlisted() && isValidSessionPhoto(request.resource.data);
         allow update, delete: if false;
       }
 
       match /detectedBoxes/{boxId} {
-        allow read, create, update: if isAllowlisted();
+        allow read: if isAllowlisted();
+        allow create, update: if isAllowlisted() && isValidDetectedBox(request.resource.data);
         allow delete: if false;
       }
     }

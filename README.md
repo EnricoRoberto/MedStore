@@ -44,6 +44,8 @@ Questi passi vanno fatti manualmente in console — non sono automatizzabili da 
 
 Una volta completati questi passi, ogni push su `main` esegue automaticamente build e deploy tramite GitHub Actions (`.github/workflows/deploy.yml`).
 
+Nota: `web/public/icon-192.png` e `icon-512.png` sono placeholder a tinta unita (per rendere installabile la PWA da subito) — sostituiscili con l'icona reale dell'app quando disponibile.
+
 ## Milestone di sviluppo
 
 - [x] M1 — Scaffold repo, config Firebase, CI
@@ -54,4 +56,4 @@ Una volta completati questi passi, ogni push su `main` esegue automaticamente bu
 - [x] M6 — Storicizzazione inventario
 - [x] M7 — Notifiche push (FCM) + funzione schedulata
 - [x] M8 — Pagina statistiche/report
-- [ ] M9 — Rifinitura PWA, manuale utente completo, hardening CI/rules
+- [x] M9 — Rifinitura PWA, manuale utente completo, hardening CI/rules
