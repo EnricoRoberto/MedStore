@@ -11,9 +11,9 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useEffect, useState } from "react";
-import { db, storage } from "./firebase";
+import { db } from "./firebase";
+import { compressImageToDataUrl } from "./imageCompress";
 import { createMedication, updateMedication } from "./medications";
 import type {
   BoxStatus,
@@ -90,8 +90,7 @@ function photoFromDoc(snapshot: QueryDocumentSnapshot<DocumentData>): SessionPho
   return {
     id: snapshot.id,
     type: data.type ?? "general",
-    storagePath: data.storagePath ?? "",
-    downloadURL: data.downloadURL ?? "",
+    dataUrl: data.dataUrl ?? "",
     contentType: data.contentType ?? "image/jpeg",
     boxId: data.boxId ?? null,
     uploadedAt: data.uploadedAt ?? null,
@@ -124,17 +123,12 @@ export async function uploadSessionPhoto(
   uploadedBy: string,
   boxId: string | null = null,
 ): Promise<string> {
-  const photoId = crypto.randomUUID();
-  const storagePath = `inventorySessions/${sessionId}/${photoId}-${file.name}`;
-  const storageRef = ref(storage, storagePath);
-  await uploadBytes(storageRef, file, { contentType: file.type });
-  const downloadURL = await getDownloadURL(storageRef);
+  const dataUrl = await compressImageToDataUrl(file);
 
   const docRef = await addDoc(collection(db, SESSIONS_COLLECTION, sessionId, "photos"), {
     type,
-    storagePath,
-    downloadURL,
-    contentType: file.type,
+    dataUrl,
+    contentType: "image/jpeg",
     boxId,
     uploadedAt: serverTimestamp(),
     uploadedBy,

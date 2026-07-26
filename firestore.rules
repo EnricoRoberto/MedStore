@@ -32,7 +32,8 @@ service cloud.firestore {
 
     function isValidSessionPhoto(data) {
       return data.type in ['general', 'rotation', 'targeted']
-        && data.storagePath is string;
+        && data.dataUrl is string
+        && data.dataUrl.size() < 900000;
     }
 
     function isValidDetectedBox(data) {

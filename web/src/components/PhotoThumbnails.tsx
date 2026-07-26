@@ -1,6 +1,6 @@
 interface Thumbnail {
   id: string;
-  downloadURL: string;
+  dataUrl: string;
 }
 
 export function PhotoThumbnails({ photos }: { photos: Thumbnail[] }) {
@@ -11,7 +11,7 @@ export function PhotoThumbnails({ photos }: { photos: Thumbnail[] }) {
       {photos.map((photo) => (
         <img
           key={photo.id}
-          src={photo.downloadURL}
+          src={photo.dataUrl}
           alt=""
           className="h-16 w-16 rounded-md border border-slate-200 object-cover"
         />

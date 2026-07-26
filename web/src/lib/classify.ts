@@ -70,19 +70,12 @@ Analizza tutte le foto fornite (indicizzate a partire da 0 nell'ordine in cui te
 
 Se due confezioni sembrano simili ma non sei sicuro che siano la stessa confezione fisica, trattale come voci separate con confidenza più bassa piuttosto che unirle a caso. Rispondi solo con il JSON richiesto.`;
 
-async function fetchImageAsInlineData(url: string): Promise<{ mimeType: string; data: string }> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Impossibile scaricare la foto (${response.status}).`);
+function inlineDataFromDataUrl(dataUrl: string): { mimeType: string; data: string } {
+  const match = /^data:([^;]+);base64,(.*)$/s.exec(dataUrl);
+  if (!match) {
+    throw new Error("Foto non valida.");
   }
-  const blob = await response.blob();
-  const buffer = await blob.arrayBuffer();
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return { mimeType: blob.type || "image/jpeg", data: btoa(binary) };
+  return { mimeType: match[1], data: match[2] };
 }
 
 // Nessuna Cloud Function: la classificazione chiama direttamente la Gemini
@@ -122,11 +115,9 @@ export async function classifyPhotosWithAi(sessionId: string): Promise<number> {
     return 0;
   }
 
-  const imageParts = await Promise.all(
-    candidatePhotos.map(async (photoDoc) => ({
-      inlineData: await fetchImageAsInlineData(photoDoc.data().downloadURL as string),
-    })),
-  );
+  const imageParts = candidatePhotos.map((photoDoc) => ({
+    inlineData: inlineDataFromDataUrl(photoDoc.data().dataUrl as string),
+  }));
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
