@@ -16,8 +16,7 @@ export type PhotoType = "general" | "rotation" | "targeted";
 export interface SessionPhoto {
   id: string;
   type: PhotoType;
-  storagePath: string;
-  downloadURL: string;
+  dataUrl: string;
   contentType: string;
   boxId: string | null;
   uploadedAt: Timestamp | null;

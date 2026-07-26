@@ -2,12 +2,12 @@
 
 Web app per raccogliere, classificare e tenere in inventario le confezioni di farmaci di casa tramite foto da smartphone, con classificazione assistita da IA (Gemini), storicizzazione periodica dell'inventario, avvisi di scadenza/quantità e log delle modifiche.
 
-Architettura pensata per restare **sempre gratuita** (piano Firebase Spark): nessuna Cloud Function, nessun servizio a pagamento. La logica che altrove richiederebbe un backend (whitelist, audit log, classificazione IA) gira lato client, appoggiandosi solo a Firestore Security Rules e a una chiamata diretta alla Gemini Developer API.
+Architettura pensata per restare **sempre gratuita** (piano Firebase Spark): nessuna Cloud Function, nessun Cloud Storage, nessun servizio a pagamento. La logica che altrove richiederebbe un backend (whitelist, audit log, classificazione IA) gira lato client, appoggiandosi solo a Firestore Security Rules e a una chiamata diretta alla Gemini Developer API. Le foto vengono ridimensionate/compresse nel browser e salvate come stringa base64 dentro i documenti Firestore, invece che su Cloud Storage — che dal 2024 richiede il piano Blaze (a pagamento) anche solo per pubblicarne le security rules.
 
 ## Struttura del progetto
 
-- `web/` — frontend React + TypeScript + Vite (PWA), Firebase Auth/Firestore/Storage via SDK client.
-- `firebase.json`, `.firebaserc`, `firestore.rules`, `firestore.indexes.json`, `storage.rules` — configurazione Firebase condivisa.
+- `web/` — frontend React + TypeScript + Vite (PWA), Firebase Auth/Firestore via SDK client.
+- `firebase.json`, `.firebaserc`, `firestore.rules`, `firestore.indexes.json` — configurazione Firebase condivisa.
 
 ## Sviluppo locale
 
@@ -26,7 +26,7 @@ Questi passi vanno fatti manualmente in console — non sono automatizzabili da 
 
 1. Crea un progetto su [Firebase Console](https://console.firebase.google.com).
 2. Abilita **Authentication** e attiva il provider **Google**.
-3. Abilita **Firestore** e **Storage**.
+3. Abilita **Firestore** (Storage non serve: le foto sono salvate come base64 in Firestore).
 4. Registra una **Web App** in Project Settings → Your apps per ottenere i valori di `firebaseConfig`; aggiungili come secret GitHub `VITE_FIREBASE_*` (vedi `web/.env.example`) e nel tuo `.env.local` locale.
 5. Aggiungi l'ID progetto come secret GitHub `FIREBASE_PROJECT_ID`, e sostituiscilo anche in `.firebaserc`.
 6. In Project Settings → Service accounts, genera una chiave privata JSON con i ruoli Firebase Hosting Admin e Cloud Datastore/Firestore Rules Admin (solo per far girare `firebase deploy` da GitHub Actions — non serve alcun servizio a pagamento). Aggiungila come secret GitHub `FIREBASE_SERVICE_ACCOUNT`.

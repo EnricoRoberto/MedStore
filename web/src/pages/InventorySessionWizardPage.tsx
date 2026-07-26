@@ -44,7 +44,7 @@ const STATUS_LABELS: Record<DetectedBox["status"], string> = {
 };
 
 function boxPhotoRefs(box: DetectedBox, photos: SessionPhoto[]): string[] {
-  return photos.filter((photo) => box.photoIds.includes(photo.id)).map((photo) => photo.storagePath);
+  return photos.filter((photo) => box.photoIds.includes(photo.id)).map((photo) => photo.id);
 }
 
 export function InventorySessionWizardPage() {
