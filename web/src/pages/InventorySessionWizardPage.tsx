@@ -5,10 +5,10 @@ import { MedicationFields } from "../components/MedicationFields";
 import { PhotoThumbnails } from "../components/PhotoThumbnails";
 import { QuantityBar } from "../components/QuantityBar";
 import { useAuth } from "../lib/auth";
+import { classifyPhotosWithAi } from "../lib/classify";
 import {
   addDetectedBox,
   classifyBox,
-  classifyPhotosWithAi,
   completeInventorySession,
   confirmBoxAsExistingMedication,
   confirmBoxAsNewMedication,

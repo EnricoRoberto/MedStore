@@ -52,11 +52,10 @@ const sections: Section[] = [
     ],
   },
   {
-    title: "Notifiche",
+    title: "Avvisi",
     body: [
-      "MedStore invia notifiche push quando un farmaco sta per scadere, la quantità residua sta per esaurirsi o è esaurita, in base a soglie configurabili (default: entro 30 giorni dalla scadenza, quantità bassa sotto il 20%, esaurita sotto il 5%).",
-      "Attivale con il pulsante 🔔 in alto nella pagina: il browser chiederà il permesso di mostrare notifiche. Una volta attive restano tali finché non revochi il permesso dalle impostazioni del browser.",
-      "Ogni condizione (scadenza, scorta bassa, esaurito) viene notificata una sola volta finché resta vera, per evitare notifiche ripetute ogni giorno.",
+      "Quando apri MedStore, se c'è qualcosa che richiede attenzione (un farmaco in scadenza, con scorta bassa o esaurito) compare un banner in alto con il riepilogo, in base a soglie configurabili (default: entro 30 giorni dalla scadenza, quantità bassa sotto il 20%, esaurita sotto il 5%).",
+      "Non essendoci un servizio sempre attivo in background, l'avviso si aggiorna ogni volta che apri l'app: non è una notifica push del telefono, ma un promemoria visibile appena la apri.",
     ],
   },
   {

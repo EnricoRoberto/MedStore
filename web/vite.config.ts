@@ -10,15 +10,8 @@ export default defineConfig({
       srcDir: "src",
       filename: "sw.ts",
       injectManifest: {
-        // Bundle come script classico: la registrazione manuale (per passare
-        // la config Firebase via querystring, vedi lib/notifications.ts) non
-        // deve preoccuparsi di { type: "module" }.
         rollupFormat: "iife",
       },
-      // Registrazione manuale (lib/serviceWorker.ts), non lo script iniettato
-      // dal plugin, così possiamo passare la config Firebase via querystring
-      // e ottenere la ServiceWorkerRegistration per getToken() di FCM.
-      injectRegister: false,
       registerType: "autoUpdate",
       manifest: {
         name: "MedStore",

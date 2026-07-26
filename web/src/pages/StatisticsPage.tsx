@@ -1,18 +1,12 @@
 import { useMemo } from "react";
 import { StatCard } from "../components/StatCard";
+import { daysUntil } from "../lib/dates";
 import { useInventorySessions } from "../lib/inventorySessions";
 import { useMedications } from "../lib/medications";
 
 const EXPIRING_WITHIN_DAYS = 30;
 const LOW_QUANTITY_PERCENT = 20;
 const EXHAUSTED_PERCENT = 5;
-
-function daysUntil(dateStr: string): number {
-  const target = new Date(`${dateStr}T00:00:00`);
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  return Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-}
 
 export function StatisticsPage() {
   const medications = useMedications();

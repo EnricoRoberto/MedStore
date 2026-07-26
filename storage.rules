@@ -3,8 +3,12 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
+    // Nessuna Cloud Function e nessun custom claim: la whitelist si verifica
+    // via riferimento cross-service alla stessa collezione Firestore /allowlist.
     function isAllowlisted() {
-      return request.auth != null && request.auth.token.allowlisted == true;
+      return request.auth != null
+        && firestore.exists(/databases/(default)/documents/allowlist/$(request.auth.token.email))
+        && firestore.get(/databases/(default)/documents/allowlist/$(request.auth.token.email)).data.active == true;
     }
 
     function isValidImageUpload() {

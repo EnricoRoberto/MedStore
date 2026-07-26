@@ -11,10 +11,9 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import { httpsCallable } from "firebase/functions";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useEffect, useState } from "react";
-import { db, functions, storage } from "./firebase";
+import { db, storage } from "./firebase";
 import { createMedication, updateMedication } from "./medications";
 import type {
   BoxStatus,
@@ -257,14 +256,4 @@ export async function confirmBoxAsExistingMedication(
     status: "merged_into_existing" satisfies BoxStatus,
     updatedAt: serverTimestamp(),
   });
-}
-
-const classifyPhotosCallable = httpsCallable<{ sessionId: string }, { boxesCreated: number }>(
-  functions,
-  "classifyPhotos",
-);
-
-export async function classifyPhotosWithAi(sessionId: string): Promise<number> {
-  const result = await classifyPhotosCallable({ sessionId });
-  return result.data.boxesCreated;
 }
