@@ -3,7 +3,8 @@ import { AppShell } from "./components/AppShell";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useAuth } from "./lib/auth";
 import { HelpPage } from "./pages/HelpPage";
-import { HomePage } from "./pages/HomePage";
+import { MedicationFormPage } from "./pages/MedicationFormPage";
+import { MedicationsListPage } from "./pages/MedicationsListPage";
 import { LoginPage } from "./pages/LoginPage";
 
 function LoginRoute() {
@@ -27,7 +28,9 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<HomePage />} />
+        <Route index element={<MedicationsListPage />} />
+        <Route path="farmaci/nuovo" element={<MedicationFormPage />} />
+        <Route path="farmaci/:id" element={<MedicationFormPage />} />
         <Route path="guida" element={<HelpPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
