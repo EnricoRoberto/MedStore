@@ -7,6 +7,7 @@ import { InventorySessionsListPage } from "./pages/InventorySessionsListPage";
 import { InventorySessionWizardPage } from "./pages/InventorySessionWizardPage";
 import { MedicationFormPage } from "./pages/MedicationFormPage";
 import { MedicationsListPage } from "./pages/MedicationsListPage";
+import { StatisticsPage } from "./pages/StatisticsPage";
 import { LoginPage } from "./pages/LoginPage";
 
 function LoginRoute() {
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="farmaci/:id" element={<MedicationFormPage />} />
         <Route path="inventario" element={<InventorySessionsListPage />} />
         <Route path="inventario/:sessionId" element={<InventorySessionWizardPage />} />
+        <Route path="statistiche" element={<StatisticsPage />} />
         <Route path="guida" element={<HelpPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

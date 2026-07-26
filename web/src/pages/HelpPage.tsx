@@ -63,7 +63,7 @@ const sections: Section[] = [
   {
     title: "Statistiche",
     body: [
-      "Una pagina dedicata riassume l'inventario: numero di farmaci in uso, in scadenza, esauriti e altre metriche utili.",
+      "La pagina Statistiche riassume l'inventario: numero di farmaci in uso e archiviati, da banco vs con ricetta, in scadenza o scaduti, con scorta bassa o esauriti, sessioni di inventario completate e quanti farmaci usa ciascuna persona.",
     ],
     status: "Disponibile dalla Milestone 8.",
   },

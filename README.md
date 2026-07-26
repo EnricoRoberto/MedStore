@@ -53,5 +53,5 @@ Una volta completati questi passi, ogni push su `main` esegue automaticamente bu
 - [x] M5 — Classificazione reale con Gemini (Vertex AI in Firebase) + conferma manuale
 - [x] M6 — Storicizzazione inventario
 - [x] M7 — Notifiche push (FCM) + funzione schedulata
-- [ ] M8 — Pagina statistiche/report
+- [x] M8 — Pagina statistiche/report
 - [ ] M9 — Rifinitura PWA, manuale utente completo, hardening CI/rules
