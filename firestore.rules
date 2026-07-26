@@ -3,8 +3,12 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Nessuna Cloud Function e nessun custom claim: la whitelist si verifica
+    // direttamente contro la collezione /allowlist (niente piano Blaze).
     function isAllowlisted() {
-      return request.auth != null && request.auth.token.allowlisted == true;
+      return request.auth != null
+        && exists(/databases/$(database)/documents/allowlist/$(request.auth.token.email))
+        && get(/databases/$(database)/documents/allowlist/$(request.auth.token.email)).data.active == true;
     }
 
     function isValidMedication(data) {
@@ -39,8 +43,10 @@ service cloud.firestore {
     }
 
     match /allowlist/{email} {
-      // Managed only from the Firebase console / Admin SDK, never from the client.
-      allow read, write: if false;
+      // Ogni utente può leggere solo la propria voce (per sapere se è autorizzato
+      // subito dopo il login); le scritture restano riservate alla console Firebase.
+      allow read: if request.auth != null && request.auth.token.email == email;
+      allow write: if false;
     }
 
     match /users/{uid} {
@@ -54,9 +60,10 @@ service cloud.firestore {
       allow delete: if false;
 
       match /changeLog/{logId} {
-        allow read: if isAllowlisted();
-        // Only written by the onMedicationWrite Cloud Function (Admin SDK bypasses rules).
-        allow write: if false;
+        allow read, create: if isAllowlisted();
+        // Nessuna Cloud Function di audit: il client scrive farmaco e log
+        // dello stesso cambiamento nello stesso batch (vedi lib/medications.ts).
+        allow update, delete: if false;
       }
     }
 
@@ -76,12 +83,6 @@ service cloud.firestore {
         allow create, update: if isAllowlisted() && isValidDetectedBox(request.resource.data);
         allow delete: if false;
       }
-    }
-
-    match /fcmTokens/{tokenId} {
-      allow read: if isAllowlisted();
-      allow create, update: if isAllowlisted() && request.resource.data.uid == request.auth.uid;
-      allow delete: if isAllowlisted() && resource.data.uid == request.auth.uid;
     }
 
     match /config/{doc} {

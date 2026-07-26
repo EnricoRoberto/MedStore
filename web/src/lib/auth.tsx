@@ -7,12 +7,13 @@ import {
 } from "react";
 import {
   GoogleAuthProvider,
-  onIdTokenChanged,
+  onAuthStateChanged,
   signInWithPopup,
   signOut as firebaseSignOut,
   type User,
 } from "firebase/auth";
-import { auth } from "./firebase";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { auth, db } from "./firebase";
 
 export type AuthStatus = "loading" | "signed-out" | "unauthorized" | "authorized";
 
@@ -29,21 +30,50 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
+// Nessuna Cloud Function/custom claim: la whitelist si verifica leggendo
+// direttamente /allowlist/{email} (le regole permettono a ciascun utente di
+// leggere solo la propria voce). Se autorizzato, sincronizza /users/{uid}.
+async function checkAllowlistedAndSyncUser(user: User): Promise<boolean> {
+  if (!user.email) return false;
+
+  const allowlistSnap = await getDoc(doc(db, "allowlist", user.email));
+  const isAllowlisted = allowlistSnap.exists() && allowlistSnap.data().active === true;
+  if (!isAllowlisted) {
+    return false;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+  await setDoc(
+    userRef,
+    {
+      email: user.email,
+      displayName: user.displayName ?? null,
+      photoURL: user.photoURL ?? null,
+      lastSignInAt: serverTimestamp(),
+      ...(userSnap.exists() ? {} : { createdAt: serverTimestamp() }),
+    },
+    { merge: true },
+  );
+
+  return true;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [user, setUser] = useState<User | null>(null);
   const [signInError, setSignInError] = useState<string | null>(null);
 
   useEffect(() => {
-    return onIdTokenChanged(auth, async (nextUser) => {
+    return onAuthStateChanged(auth, async (nextUser) => {
       if (!nextUser) {
         setUser(nextUser);
         setStatus("signed-out");
         return;
       }
-      const tokenResult = await nextUser.getIdTokenResult();
       setUser(nextUser);
-      setStatus(tokenResult.claims.allowlisted === true ? "authorized" : "unauthorized");
+      const allowlisted = await checkAllowlistedAndSyncUser(nextUser);
+      setStatus(allowlisted ? "authorized" : "unauthorized");
     });
   }, []);
 
@@ -52,9 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
-      setSignInError(
-        error instanceof Error ? error.message : "Accesso non riuscito. Riprova.",
-      );
+      setSignInError(error instanceof Error ? error.message : "Accesso non riuscito. Riprova.");
     }
   }
 

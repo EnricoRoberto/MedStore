@@ -1,13 +1,13 @@
 import {
-  addDoc,
   arrayUnion,
   collection,
   doc,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
-  updateDoc,
+  writeBatch,
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
@@ -16,6 +16,39 @@ import { db } from "./firebase";
 import type { ChangeLogEntry, Medication, MedicationFormValues } from "../types/medication";
 
 const MEDICATIONS_COLLECTION = "medications";
+
+const TRACKED_FIELDS = [
+  "producer",
+  "name",
+  "activeIngredient",
+  "indication",
+  "requiresPrescription",
+  "tags",
+  "quantityPercent",
+  "expirationDate",
+  "status",
+] as const;
+
+function valuesEqual(a: unknown, b: unknown): boolean {
+  return JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+}
+
+// Nessuna Cloud Function di audit: il diff viene calcolato qui e scritto nello
+// stesso batch della modifica al farmaco (vedi createMedication/updateMedication).
+function computeChanges(
+  before: Partial<MedicationFormValues> | null,
+  after: MedicationFormValues,
+): Record<string, { before: unknown; after: unknown }> {
+  const changes: Record<string, { before: unknown; after: unknown }> = {};
+  for (const field of TRACKED_FIELDS) {
+    const beforeValue = before?.[field];
+    const afterValue = after[field];
+    if (!valuesEqual(beforeValue, afterValue)) {
+      changes[field] = { before: beforeValue ?? null, after: afterValue ?? null };
+    }
+  }
+  return changes;
+}
 
 function fromDoc(snapshot: QueryDocumentSnapshot<DocumentData>): Medication {
   const data = snapshot.data();
@@ -100,14 +133,26 @@ export async function createMedication(
   editorLabel: string,
   photoRefs: string[] = [],
 ): Promise<string> {
-  const docRef = await addDoc(collection(db, MEDICATIONS_COLLECTION), {
+  const medicationRef = doc(collection(db, MEDICATIONS_COLLECTION));
+  const changeLogRef = doc(collection(medicationRef, "changeLog"));
+
+  const batch = writeBatch(db);
+  batch.set(medicationRef, {
     ...values,
     photoRefs,
     lastModifiedBy: editorLabel,
     lastModifiedAt: serverTimestamp(),
     createdAt: serverTimestamp(),
   });
-  return docRef.id;
+  batch.set(changeLogRef, {
+    action: "create",
+    changes: computeChanges(null, values),
+    changedBy: editorLabel,
+    changedAt: serverTimestamp(),
+  });
+  await batch.commit();
+
+  return medicationRef.id;
 }
 
 export async function updateMedication(
@@ -116,10 +161,30 @@ export async function updateMedication(
   editorLabel: string,
   photoRefs?: string[],
 ): Promise<void> {
-  await updateDoc(doc(db, MEDICATIONS_COLLECTION, id), {
+  const medicationRef = doc(db, MEDICATIONS_COLLECTION, id);
+  const previousSnap = await getDoc(medicationRef);
+  const previous = previousSnap.exists()
+    ? (previousSnap.data() as Partial<MedicationFormValues>)
+    : null;
+  const changes = computeChanges(previous, values);
+
+  const batch = writeBatch(db);
+  batch.update(medicationRef, {
     ...values,
     ...(photoRefs && photoRefs.length > 0 ? { photoRefs: arrayUnion(...photoRefs) } : {}),
     lastModifiedBy: editorLabel,
     lastModifiedAt: serverTimestamp(),
   });
+
+  if (Object.keys(changes).length > 0) {
+    const changeLogRef = doc(collection(medicationRef, "changeLog"));
+    batch.set(changeLogRef, {
+      action: "update",
+      changes,
+      changedBy: editorLabel,
+      changedAt: serverTimestamp(),
+    });
+  }
+
+  await batch.commit();
 }

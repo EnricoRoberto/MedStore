@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../lib/auth";
-import { NotificationToggle } from "./NotificationToggle";
+import { AlertsBanner } from "./AlertsBanner";
 
 function navLinkClass({ isActive }: { isActive: boolean }) {
   return `rounded-md px-3 py-2 text-sm font-medium ${
@@ -31,7 +31,6 @@ export function AppShell() {
             </NavLink>
           </nav>
           <div className="flex items-center gap-3">
-            <NotificationToggle />
             {user?.photoURL && (
               <img src={user.photoURL} alt="" className="h-8 w-8 rounded-full" />
             )}
@@ -47,6 +46,7 @@ export function AppShell() {
           </div>
         </div>
       </header>
+      <AlertsBanner />
       <main className="mx-auto max-w-4xl px-4 py-6">
         <Outlet />
       </main>
