@@ -3,6 +3,8 @@ import { AppShell } from "./components/AppShell";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useAuth } from "./lib/auth";
 import { HelpPage } from "./pages/HelpPage";
+import { InventorySessionsListPage } from "./pages/InventorySessionsListPage";
+import { InventorySessionWizardPage } from "./pages/InventorySessionWizardPage";
 import { MedicationFormPage } from "./pages/MedicationFormPage";
 import { MedicationsListPage } from "./pages/MedicationsListPage";
 import { LoginPage } from "./pages/LoginPage";
@@ -31,6 +33,8 @@ export default function App() {
         <Route index element={<MedicationsListPage />} />
         <Route path="farmaci/nuovo" element={<MedicationFormPage />} />
         <Route path="farmaci/:id" element={<MedicationFormPage />} />
+        <Route path="inventario" element={<InventorySessionsListPage />} />
+        <Route path="inventario/:sessionId" element={<InventorySessionWizardPage />} />
         <Route path="guida" element={<HelpPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,8 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ChangeLogList } from "../components/ChangeLogList";
-import { QuantityBar } from "../components/QuantityBar";
-import { TagInput } from "../components/TagInput";
+import { MedicationFields } from "../components/MedicationFields";
 import { useAuth } from "../lib/auth";
 import { createMedication, updateMedication, useMedication } from "../lib/medications";
 import type { MedicationFormValues, MedicationStatus } from "../types/medication";
@@ -92,87 +91,7 @@ export function MedicationFormPage() {
         onSubmit={(event) => void handleSubmit(event)}
         className="space-y-4 rounded-lg border border-slate-200 bg-white p-5"
       >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Nome farmaco *</span>
-            <input
-              type="text"
-              required
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </label>
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Produttore</span>
-            <input
-              type="text"
-              value={form.producer}
-              onChange={(e) => setForm({ ...form, producer: e.target.value })}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </label>
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Principio attivo</span>
-            <input
-              type="text"
-              value={form.activeIngredient}
-              onChange={(e) => setForm({ ...form, activeIngredient: e.target.value })}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </label>
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Destinazione d'uso</span>
-            <input
-              type="text"
-              value={form.indication}
-              onChange={(e) => setForm({ ...form, indication: e.target.value })}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </label>
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Scadenza</span>
-            <input
-              type="date"
-              value={form.expirationDate ?? ""}
-              onChange={(e) => setForm({ ...form, expirationDate: e.target.value || null })}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </label>
-          <label className="flex items-center gap-2 self-end text-sm">
-            <input
-              type="checkbox"
-              checked={form.requiresPrescription}
-              onChange={(e) => setForm({ ...form, requiresPrescription: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-300"
-            />
-            <span className="font-medium text-slate-700">Richiede ricetta medica</span>
-          </label>
-        </div>
-
-        <label className="block text-sm">
-          <span className="font-medium text-slate-700">Tag (persone che lo usano)</span>
-          <div className="mt-1">
-            <TagInput tags={form.tags} onChange={(tags) => setForm({ ...form, tags })} />
-          </div>
-        </label>
-
-        <label className="block text-sm">
-          <span className="font-medium text-slate-700">
-            Quantità residua: {form.quantityPercent}%
-          </span>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={form.quantityPercent}
-            onChange={(e) => setForm({ ...form, quantityPercent: Number(e.target.value) })}
-            className="mt-2 w-full"
-          />
-          <div className="mt-1">
-            <QuantityBar percent={form.quantityPercent} />
-          </div>
-        </label>
+        <MedicationFields values={form} onChange={setForm} />
 
         {!isNew && (
           <label className="block text-sm">

@@ -1,5 +1,6 @@
 import {
   addDoc,
+  arrayUnion,
   collection,
   doc,
   onSnapshot,
@@ -97,23 +98,27 @@ export function useChangeLog(medicationId: string | undefined): ChangeLogEntry[]
 export async function createMedication(
   values: MedicationFormValues,
   editorLabel: string,
-): Promise<void> {
-  await addDoc(collection(db, MEDICATIONS_COLLECTION), {
+  photoRefs: string[] = [],
+): Promise<string> {
+  const docRef = await addDoc(collection(db, MEDICATIONS_COLLECTION), {
     ...values,
-    photoRefs: [],
+    photoRefs,
     lastModifiedBy: editorLabel,
     lastModifiedAt: serverTimestamp(),
     createdAt: serverTimestamp(),
   });
+  return docRef.id;
 }
 
 export async function updateMedication(
   id: string,
   values: MedicationFormValues,
   editorLabel: string,
+  photoRefs?: string[],
 ): Promise<void> {
   await updateDoc(doc(db, MEDICATIONS_COLLECTION, id), {
     ...values,
+    ...(photoRefs && photoRefs.length > 0 ? { photoRefs: arrayUnion(...photoRefs) } : {}),
     lastModifiedBy: editorLabel,
     lastModifiedAt: serverTimestamp(),
   });
