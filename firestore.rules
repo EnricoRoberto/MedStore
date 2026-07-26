@@ -1,0 +1,57 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAllowlisted() {
+      return request.auth != null && request.auth.token.allowlisted == true;
+    }
+
+    match /allowlist/{email} {
+      // Managed only from the Firebase console / Admin SDK, never from the client.
+      allow read, write: if false;
+    }
+
+    match /users/{uid} {
+      allow read: if isAllowlisted();
+      allow write: if isAllowlisted() && request.auth.uid == uid;
+    }
+
+    match /medications/{medicationId} {
+      allow read, create, update: if isAllowlisted();
+      allow delete: if false;
+
+      match /changeLog/{logId} {
+        allow read: if isAllowlisted();
+        // Only written by the onMedicationWrite Cloud Function (Admin SDK bypasses rules).
+        allow write: if false;
+      }
+    }
+
+    match /inventorySessions/{sessionId} {
+      allow read, create, update: if isAllowlisted();
+      allow delete: if false;
+
+      match /photos/{photoId} {
+        allow read, create: if isAllowlisted();
+        allow update, delete: if false;
+      }
+
+      match /detectedBoxes/{boxId} {
+        allow read, create, update: if isAllowlisted();
+        allow delete: if false;
+      }
+    }
+
+    match /fcmTokens/{tokenId} {
+      allow read: if isAllowlisted();
+      allow create, update: if isAllowlisted() && request.resource.data.uid == request.auth.uid;
+      allow delete: if isAllowlisted() && resource.data.uid == request.auth.uid;
+    }
+
+    match /config/{doc} {
+      allow read: if isAllowlisted();
+      allow write: if isAllowlisted();
+    }
+  }
+}

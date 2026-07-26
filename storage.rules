@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAllowlisted() {
+      return request.auth != null && request.auth.token.allowlisted == true;
+    }
+
+    function isValidImageUpload() {
+      return request.resource.size < 15 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    match /inventorySessions/{sessionId}/{allPaths=**} {
+      allow read: if isAllowlisted();
+      allow write: if isAllowlisted() && isValidImageUpload();
+    }
+
+    match /medications/{medicationId}/{allPaths=**} {
+      allow read: if isAllowlisted();
+      allow write: if isAllowlisted() && isValidImageUpload();
+    }
+  }
+}
