@@ -40,6 +40,7 @@ Questi passi vanno fatti manualmente in console — non sono automatizzabili da 
 11. Genera una chiave **VAPID** (Project Settings → Cloud Messaging → Web configuration) per le notifiche push; aggiungila come secret `VITE_FIREBASE_VAPID_KEY`.
 12. Aggiungi manualmente in Firestore (console) un documento per ogni email autorizzata nella collezione `allowlist` (es. `{ email: "nome@gmail.com", active: true }`) — le scritture su questa collezione sono bloccate lato client per sicurezza.
 13. Verifica che il dominio di Hosting sia nei domini autorizzati per l'autenticazione (Authentication → Settings → Authorized domains).
+14. (Opzionale) Per cambiare le soglie di notifica di default (scadenza entro 30gg, quantità bassa ≤20%, esaurita ≤5%), crea in Firestore il documento `config/notificationThresholds` con i campi `expiringWithinDays`, `lowQuantityPercent`, `exhaustedPercent`.
 
 Una volta completati questi passi, ogni push su `main` esegue automaticamente build e deploy tramite GitHub Actions (`.github/workflows/deploy.yml`).
 
@@ -51,6 +52,6 @@ Una volta completati questi passi, ogni push su `main` esegue automaticamente bu
 - [x] M4 — Wizard foto con classificazione stub (inserimento manuale)
 - [x] M5 — Classificazione reale con Gemini (Vertex AI in Firebase) + conferma manuale
 - [x] M6 — Storicizzazione inventario
-- [ ] M7 — Notifiche push (FCM) + funzione schedulata
+- [x] M7 — Notifiche push (FCM) + funzione schedulata
 - [ ] M8 — Pagina statistiche/report
 - [ ] M9 — Rifinitura PWA, manuale utente completo, hardening CI/rules

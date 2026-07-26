@@ -55,7 +55,8 @@ const sections: Section[] = [
   {
     title: "Notifiche",
     body: [
-      "MedStore invia notifiche push quando un farmaco sta per scadere o la quantità residua sta per esaurirsi, in base alle soglie configurate.",
+      "MedStore invia notifiche push quando un farmaco sta per scadere, la quantità residua sta per esaurirsi o è esaurita, in base a soglie configurabili (default: entro 30 giorni dalla scadenza, quantità bassa sotto il 20%, esaurita sotto il 5%).",
+      "Attivale con il pulsante 🔔 in alto nella pagina: il browser chiederà il permesso di mostrare notifiche.",
     ],
     status: "Disponibile dalla Milestone 7.",
   },

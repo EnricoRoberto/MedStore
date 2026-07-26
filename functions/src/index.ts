@@ -5,6 +5,4 @@ initializeApp();
 export { enforceAllowlist } from "./auth/enforceAllowlist.js";
 export { onMedicationWrite } from "./triggers/onMedicationWrite.js";
 export { classifyPhotos } from "./classify/classifyPhotos.js";
-
-// Function exports are added milestone by milestone:
-// - notifications/scheduledNotificationScan (M7)
+export { scheduledNotificationScan } from "./notifications/scheduledNotificationScan.js";
