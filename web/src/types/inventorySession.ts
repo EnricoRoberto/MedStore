@@ -18,6 +18,7 @@ export interface SessionPhoto {
   type: PhotoType;
   storagePath: string;
   downloadURL: string;
+  contentType: string;
   boxId: string | null;
   uploadedAt: Timestamp | null;
   uploadedBy: string | null;
@@ -37,6 +38,7 @@ export interface DetectedBox {
   photoIds: string[];
   classification: MedicationFormValues | null;
   medicationId: string | null;
+  confidence: number | null;
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
 }

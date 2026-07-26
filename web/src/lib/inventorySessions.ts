@@ -11,9 +11,10 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useEffect, useState } from "react";
-import { db, storage } from "./firebase";
+import { db, functions, storage } from "./firebase";
 import { createMedication, updateMedication } from "./medications";
 import type {
   BoxStatus,
@@ -92,6 +93,7 @@ function photoFromDoc(snapshot: QueryDocumentSnapshot<DocumentData>): SessionPho
     type: data.type ?? "general",
     storagePath: data.storagePath ?? "",
     downloadURL: data.downloadURL ?? "",
+    contentType: data.contentType ?? "image/jpeg",
     boxId: data.boxId ?? null,
     uploadedAt: data.uploadedAt ?? null,
     uploadedBy: data.uploadedBy ?? null,
@@ -133,6 +135,7 @@ export async function uploadSessionPhoto(
     type,
     storagePath,
     downloadURL,
+    contentType: file.type,
     boxId,
     uploadedAt: serverTimestamp(),
     uploadedBy,
@@ -149,6 +152,7 @@ function boxFromDoc(snapshot: QueryDocumentSnapshot<DocumentData>): DetectedBox 
     photoIds: data.photoIds ?? [],
     classification: data.classification ?? null,
     medicationId: data.medicationId ?? null,
+    confidence: data.confidence ?? null,
     createdAt: data.createdAt ?? null,
     updatedAt: data.updatedAt ?? null,
   };
@@ -179,6 +183,7 @@ export async function addDetectedBox(sessionId: string, label: string): Promise<
     photoIds: [],
     classification: null,
     medicationId: null,
+    confidence: null,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -252,4 +257,14 @@ export async function confirmBoxAsExistingMedication(
     status: "merged_into_existing" satisfies BoxStatus,
     updatedAt: serverTimestamp(),
   });
+}
+
+const classifyPhotosCallable = httpsCallable<{ sessionId: string }, { boxesCreated: number }>(
+  functions,
+  "classifyPhotos",
+);
+
+export async function classifyPhotosWithAi(sessionId: string): Promise<number> {
+  const result = await classifyPhotosCallable({ sessionId });
+  return result.data.boxesCreated;
 }

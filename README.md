@@ -49,7 +49,7 @@ Una volta completati questi passi, ogni push su `main` esegue automaticamente bu
 - [x] M2 — Auth (Google Sign-In) + whitelist (custom claim `allowlisted`) + shell/routing + guida
 - [x] M3 — CRUD farmaci, ricerca, barra quantità, change log
 - [x] M4 — Wizard foto con classificazione stub (inserimento manuale)
-- [ ] M5 — Classificazione reale con Gemini (Vertex AI in Firebase) + conferma manuale
+- [x] M5 — Classificazione reale con Gemini (Vertex AI in Firebase) + conferma manuale
 - [ ] M6 — Storicizzazione inventario
 - [ ] M7 — Notifiche push (FCM) + funzione schedulata
 - [ ] M8 — Pagina statistiche/report

@@ -7,6 +7,7 @@ import { useAuth } from "../lib/auth";
 import {
   addDetectedBox,
   classifyBox,
+  classifyPhotosWithAi,
   completeInventorySession,
   confirmBoxAsExistingMedication,
   confirmBoxAsNewMedication,
@@ -57,7 +58,9 @@ export function InventorySessionWizardPage() {
   const [activeBoxId, setActiveBoxId] = useState<string | null>(null);
   const [draft, setDraft] = useState<MedicationFormValues>(emptyClassification);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [classifying, setClassifying] = useState(false);
 
   const editorLabel = user?.email ?? "sconosciuto";
   const generalPhotos = photos.filter((p) => p.type === "general");
@@ -111,6 +114,25 @@ export function InventorySessionWizardPage() {
     if (!sessionId || !newBoxLabel.trim()) return;
     await addDetectedBox(sessionId, newBoxLabel.trim());
     setNewBoxLabel("");
+  }
+
+  async function handleClassifyWithAi() {
+    if (!sessionId) return;
+    setClassifying(true);
+    setError(null);
+    setInfo(null);
+    try {
+      const boxesCreated = await classifyPhotosWithAi(sessionId);
+      setInfo(
+        boxesCreated > 0
+          ? `Individuate ${boxesCreated} nuove confezioni.`
+          : "Nessuna nuova confezione individuata nelle foto disponibili. Aggiungi altre foto o classifica manualmente.",
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Classificazione IA non riuscita.");
+    } finally {
+      setClassifying(false);
+    }
   }
 
   function openClassification(box: DetectedBox) {
@@ -186,6 +208,7 @@ export function InventorySessionWizardPage() {
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
+      {info && <p className="text-sm text-teal-700">{info}</p>}
 
       <section className="rounded-lg border border-slate-200 bg-white p-5">
         <h2 className="text-base font-semibold text-slate-800">1. Foto d'insieme</h2>
@@ -230,9 +253,20 @@ export function InventorySessionWizardPage() {
           )}
         </div>
         <p className="mt-1 text-sm text-slate-500">
-          Aggiungi manualmente una voce per ogni confezione visibile nelle foto (la
-          classificazione automatica arriva nella Milestone 5), poi classificala e confermala.
+          Fai analizzare le foto dall'IA per individuare le confezioni automaticamente, oppure
+          aggiungine una manualmente se qualcuna non viene riconosciuta. Ogni confezione va poi
+          classificata (o corretta) e confermata.
         </p>
+
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <button
+            disabled={classifying || generalPhotos.length === 0}
+            onClick={() => void handleClassifyWithAi()}
+            className="rounded-md bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
+          >
+            {classifying ? "Analisi in corso…" : "✨ Classifica con IA"}
+          </button>
+        </div>
 
         <div className="mt-3 flex gap-2">
           <input
@@ -244,9 +278,9 @@ export function InventorySessionWizardPage() {
           />
           <button
             onClick={() => void handleAddBox()}
-            className="rounded-md bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700"
+            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
           >
-            + Aggiungi confezione
+            + Aggiungi manualmente
           </button>
         </div>
 
@@ -265,7 +299,11 @@ export function InventorySessionWizardPage() {
                     <p className="font-medium text-slate-800">
                       {box.classification?.name || box.label}
                     </p>
-                    <p className="text-xs text-slate-500">{STATUS_LABELS[box.status]}</p>
+                    <p className="text-xs text-slate-500">
+                      {STATUS_LABELS[box.status]}
+                      {box.confidence !== null &&
+                        ` · Confidenza IA: ${Math.round(box.confidence * 100)}%`}
+                    </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {!isDone && (
