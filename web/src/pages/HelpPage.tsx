@@ -50,6 +50,7 @@ const sections: Section[] = [
     body: [
       "La sezione Inventario elenca tutte le sessioni di rilevazione svolte nel tempo, in corso o concluse.",
       "Aprendo una sessione conclusa vedi un riepilogo: quanti farmaci nuovi sono stati censiti, quanti aggiornati, e la quantità registrata per ciascuno in quella rilevazione, utile per confrontare la situazione tra un controllo e l'altro.",
+      "Puoi eliminare una singola sessione con \"Elimina\", oppure svuotare tutto lo storico delle sessioni con \"Svuota tutto\": entrambe chiedono conferma e non sono reversibili.",
     ],
   },
   {

@@ -2,12 +2,15 @@ import {
   addDoc,
   arrayUnion,
   collection,
+  deleteDoc,
   doc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
   updateDoc,
+  writeBatch,
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
@@ -83,6 +86,46 @@ export async function completeInventorySession(sessionId: string): Promise<void>
     status: "completed" satisfies InventorySession["status"],
     completedAt: serverTimestamp(),
   });
+}
+
+// Le foto sono base64 in Firestore (niente Cloud Storage da ripulire), ma
+// vanno comunque eliminate esplicitamente insieme alle scatole rilevate:
+// cancellare il documento della sessione non elimina le sue sottocollezioni.
+async function deleteSessionSubcollections(sessionId: string): Promise<void> {
+  const sessionRef = doc(db, SESSIONS_COLLECTION, sessionId);
+  const [photosSnap, boxesSnap] = await Promise.all([
+    getDocs(collection(sessionRef, "photos")),
+    getDocs(collection(sessionRef, "detectedBoxes")),
+  ]);
+
+  const docsToDelete = [...photosSnap.docs, ...boxesSnap.docs];
+  const CHUNK_SIZE = 450;
+  for (let i = 0; i < docsToDelete.length; i += CHUNK_SIZE) {
+    const batch = writeBatch(db);
+    for (const d of docsToDelete.slice(i, i + CHUNK_SIZE)) {
+      batch.delete(d.ref);
+    }
+    await batch.commit();
+  }
+}
+
+export async function deleteInventorySession(sessionId: string): Promise<void> {
+  await deleteSessionSubcollections(sessionId);
+  await deleteDoc(doc(db, SESSIONS_COLLECTION, sessionId));
+}
+
+export async function deleteAllInventorySessions(sessions: InventorySession[]): Promise<void> {
+  for (const session of sessions) {
+    await deleteSessionSubcollections(session.id);
+  }
+  const CHUNK_SIZE = 450;
+  for (let i = 0; i < sessions.length; i += CHUNK_SIZE) {
+    const batch = writeBatch(db);
+    for (const session of sessions.slice(i, i + CHUNK_SIZE)) {
+      batch.delete(doc(db, SESSIONS_COLLECTION, session.id));
+    }
+    await batch.commit();
+  }
 }
 
 function photoFromDoc(snapshot: QueryDocumentSnapshot<DocumentData>): SessionPhoto {
