@@ -44,8 +44,8 @@ const STATUS_LABELS: Record<DetectedBox["status"], string> = {
   merged_into_existing: "Confermata (aggiornato farmaco esistente)",
 };
 
-function boxPhotoRefs(box: DetectedBox, photos: SessionPhoto[]): string[] {
-  return photos.filter((photo) => box.photoIds.includes(photo.id)).map((photo) => photo.id);
+function boxPhotos(box: DetectedBox, photos: SessionPhoto[]): SessionPhoto[] {
+  return photos.filter((photo) => box.photoIds.includes(photo.id));
 }
 
 export function InventorySessionWizardPage() {
@@ -237,7 +237,7 @@ export function InventorySessionWizardPage() {
     setBusy(true);
     setError(null);
     try {
-      await confirmBoxAsNewMedication(sessionId, box, editorLabel, boxPhotoRefs(box, photos));
+      await confirmBoxAsNewMedication(sessionId, box, editorLabel, boxPhotos(box, photos));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Conferma non riuscita.");
     } finally {
@@ -255,7 +255,7 @@ export function InventorySessionWizardPage() {
         box,
         medicationId,
         editorLabel,
-        boxPhotoRefs(box, photos),
+        boxPhotos(box, photos),
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Conferma non riuscita.");

@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { StatCard } from "../components/StatCard";
-import { daysUntil } from "../lib/dates";
 import { useInventorySessions } from "../lib/inventorySessions";
 import { useMedications } from "../lib/medications";
+import { isExhausted, isExpired, isExpiringSoon, isLowStock } from "../lib/medicationStatus";
 import { useNotificationThresholds } from "../lib/notificationThresholds";
 import { buildInventoryReportText } from "../lib/report";
 
@@ -17,18 +17,10 @@ export function StatisticsPage() {
 
     const active = medications.filter((m) => m.status === "active");
     const archived = medications.filter((m) => m.status === "archived");
-    const expired = active.filter((m) => m.expirationDate && daysUntil(m.expirationDate) < 0);
-    const expiringSoon = active.filter(
-      (m) =>
-        m.expirationDate &&
-        daysUntil(m.expirationDate) >= 0 &&
-        daysUntil(m.expirationDate) <= thresholds.expiringWithinDays,
-    );
-    const exhausted = active.filter((m) => m.quantityPercent <= thresholds.exhaustedPercent);
-    const low = active.filter((m) => {
-      const minThreshold = m.minQuantityPercent ?? thresholds.lowQuantityPercent;
-      return m.quantityPercent > thresholds.exhaustedPercent && m.quantityPercent <= minThreshold;
-    });
+    const expired = active.filter((m) => isExpired(m));
+    const expiringSoon = active.filter((m) => isExpiringSoon(m, thresholds));
+    const exhausted = active.filter((m) => isExhausted(m, thresholds));
+    const low = active.filter((m) => isLowStock(m, thresholds));
     const requiresPrescription = active.filter((m) => m.requiresPrescription).length;
 
     const byPerson = new Map<string, number>();

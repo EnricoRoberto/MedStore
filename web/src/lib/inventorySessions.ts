@@ -17,7 +17,7 @@ import {
 import { useEffect, useState } from "react";
 import { db } from "./firebase";
 import { compressImageToDataUrl } from "./imageCompress";
-import { createMedication, updateMedication } from "./medications";
+import { copyPhotosToMedication, createMedication, updateMedication } from "./medications";
 import type {
   BoxStatus,
   DetectedBox,
@@ -264,12 +264,20 @@ export async function confirmBoxAsNewMedication(
   sessionId: string,
   box: DetectedBox,
   editorLabel: string,
-  photoRefs: string[],
+  boxPhotos: SessionPhoto[],
 ): Promise<void> {
   if (!box.classification) {
     throw new Error("La scatola non è ancora stata classificata.");
   }
+  const photoRefs = boxPhotos.map((photo) => photo.id);
   const medicationId = await createMedication(box.classification, editorLabel, photoRefs);
+  if (boxPhotos.length > 0) {
+    await copyPhotosToMedication(
+      medicationId,
+      boxPhotos.map((photo) => photo.dataUrl),
+      editorLabel,
+    );
+  }
   await updateDoc(doc(db, SESSIONS_COLLECTION, sessionId, "detectedBoxes", box.id), {
     medicationId,
     status: "confirmed" satisfies BoxStatus,
@@ -282,12 +290,20 @@ export async function confirmBoxAsExistingMedication(
   box: DetectedBox,
   medicationId: string,
   editorLabel: string,
-  photoRefs: string[],
+  boxPhotos: SessionPhoto[],
 ): Promise<void> {
   if (!box.classification) {
     throw new Error("La scatola non è ancora stata classificata.");
   }
+  const photoRefs = boxPhotos.map((photo) => photo.id);
   await updateMedication(medicationId, box.classification, editorLabel, photoRefs);
+  if (boxPhotos.length > 0) {
+    await copyPhotosToMedication(
+      medicationId,
+      boxPhotos.map((photo) => photo.dataUrl),
+      editorLabel,
+    );
+  }
   await updateDoc(doc(db, SESSIONS_COLLECTION, sessionId, "detectedBoxes", box.id), {
     medicationId,
     status: "merged_into_existing" satisfies BoxStatus,

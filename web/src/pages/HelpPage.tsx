@@ -28,7 +28,8 @@ const sections: Section[] = [
       "Per ogni farmaco vengono registrati: produttore, nome, principio attivo, destinazione d'uso, obbligo o meno di ricetta medica, e i tag con i nomi delle persone che lo usano.",
       "Puoi correggere questi dati in qualsiasi momento cercando o selezionando il farmaco dalla schermata principale.",
       "Se non è più in casa ma vuoi mantenerne lo storico, impostane lo stato su \"Archiviato\"; se invece vuoi rimuoverlo del tutto, usa \"Elimina farmaco\" nella sua scheda (richiede conferma). Dalla schermata principale puoi anche \"Svuota tutto\" l'inventario in un colpo solo, sempre con conferma: entrambe le azioni non sono reversibili.",
-      "Nella scheda di un farmaco già censito puoi aggiungere altre foto (es. il lato con la scadenza leggibile) e premere \"Affina con IA\" per far rileggere i dati al modello e pre-compilare i campi da rivedere prima di salvare, senza dover rifare una sessione di inventario completa.",
+      "Le foto scattate durante la sessione di inventario per una confezione (foto d'insieme, girate, mirate) restano collegate al farmaco anche dopo la conferma: le ritrovi nella sua scheda insieme a quelle che aggiungi in seguito.",
+      "Nella scheda di un farmaco già censito puoi aggiungere altre foto (es. il lato con la scadenza leggibile) e premere \"Affina con IA\" per far rileggere al modello tutte le foto disponibili (quelle del wizard più quelle nuove) e pre-compilare i campi da rivedere prima di salvare, senza dover rifare una sessione di inventario completa.",
     ],
   },
   {
@@ -58,6 +59,7 @@ const sections: Section[] = [
     body: [
       "Quando apri MedStore, se c'è qualcosa che richiede attenzione (un farmaco in scadenza, con scorta bassa o esaurito) compare un banner in alto con il riepilogo, in base a soglie configurabili (default: entro 30 giorni dalla scadenza, quantità bassa sotto il 20%, esaurita sotto il 5%).",
       "Nella scheda di ogni farmaco puoi impostare una \"Scorta minima desiderata\" personalizzata: se la lasci vuota vale la soglia generale del 20%, altrimenti quel farmaco specifico segnala scorta bassa in base alla percentuale che hai scelto tu (utile per farmaci che vuoi tenere sempre ben forniti).",
+      "Nella schermata principale, ogni farmaco che ha qualcosa da segnalare mostra un 'etichetta accanto al nome (Scaduto, In scadenza, Esaurito o Scorta bassa): se un farmaco ha più problemi insieme, ha sempre priorità la scadenza rispetto alla scorta.",
       "Non essendoci un servizio sempre attivo in background, l'avviso si aggiorna ogni volta che apri l'app: non è una notifica push del telefono, ma un promemoria visibile appena la apri.",
     ],
   },

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { daysUntil } from "../lib/dates";
 import { useMedications } from "../lib/medications";
+import { isExhausted, isLowStock } from "../lib/medicationStatus";
 import { useNotificationThresholds } from "../lib/notificationThresholds";
 
 // Nessuna Cloud Function schedulata né notifiche push: l'avviso viene
@@ -16,11 +17,8 @@ export function AlertsBanner() {
   const expiring = active.filter(
     (m) => m.expirationDate && daysUntil(m.expirationDate) <= thresholds.expiringWithinDays,
   );
-  const exhausted = active.filter((m) => m.quantityPercent <= thresholds.exhaustedPercent);
-  const low = active.filter((m) => {
-    const minThreshold = m.minQuantityPercent ?? thresholds.lowQuantityPercent;
-    return m.quantityPercent > thresholds.exhaustedPercent && m.quantityPercent <= minThreshold;
-  });
+  const exhausted = active.filter((m) => isExhausted(m, thresholds));
+  const low = active.filter((m) => isLowStock(m, thresholds));
 
   if (expiring.length === 0 && exhausted.length === 0 && low.length === 0) {
     return null;
