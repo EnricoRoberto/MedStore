@@ -3,15 +3,13 @@ import { StatCard } from "../components/StatCard";
 import { daysUntil } from "../lib/dates";
 import { useInventorySessions } from "../lib/inventorySessions";
 import { useMedications } from "../lib/medications";
+import { useNotificationThresholds } from "../lib/notificationThresholds";
 import { buildInventoryReportText } from "../lib/report";
-
-const EXPIRING_WITHIN_DAYS = 30;
-const LOW_QUANTITY_PERCENT = 20;
-const EXHAUSTED_PERCENT = 5;
 
 export function StatisticsPage() {
   const medications = useMedications();
   const sessions = useInventorySessions();
+  const thresholds = useNotificationThresholds();
   const [shareMessage, setShareMessage] = useState<string | null>(null);
 
   const stats = useMemo(() => {
@@ -24,12 +22,13 @@ export function StatisticsPage() {
       (m) =>
         m.expirationDate &&
         daysUntil(m.expirationDate) >= 0 &&
-        daysUntil(m.expirationDate) <= EXPIRING_WITHIN_DAYS,
+        daysUntil(m.expirationDate) <= thresholds.expiringWithinDays,
     );
-    const exhausted = active.filter((m) => m.quantityPercent <= EXHAUSTED_PERCENT);
-    const low = active.filter(
-      (m) => m.quantityPercent > EXHAUSTED_PERCENT && m.quantityPercent <= LOW_QUANTITY_PERCENT,
-    );
+    const exhausted = active.filter((m) => m.quantityPercent <= thresholds.exhaustedPercent);
+    const low = active.filter((m) => {
+      const minThreshold = m.minQuantityPercent ?? thresholds.lowQuantityPercent;
+      return m.quantityPercent > thresholds.exhaustedPercent && m.quantityPercent <= minThreshold;
+    });
     const requiresPrescription = active.filter((m) => m.requiresPrescription).length;
 
     const byPerson = new Map<string, number>();
@@ -50,7 +49,7 @@ export function StatisticsPage() {
       otc: active.length - requiresPrescription,
       byPerson: Array.from(byPerson.entries()).sort((a, b) => b[1] - a[1]),
     };
-  }, [medications]);
+  }, [medications, thresholds]);
 
   const completedSessions = sessions?.filter((s) => s.status === "completed") ?? [];
   const lastSession = completedSessions[0];

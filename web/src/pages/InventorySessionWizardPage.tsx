@@ -31,6 +31,7 @@ const emptyClassification: MedicationFormValues = {
   requiresPrescription: false,
   tags: [],
   quantityPercent: 100,
+  minQuantityPercent: null,
   expirationDate: null,
   status: "active",
 };

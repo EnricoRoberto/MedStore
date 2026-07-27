@@ -11,6 +11,7 @@ export interface Medication {
   requiresPrescription: boolean;
   tags: string[];
   quantityPercent: number;
+  minQuantityPercent: number | null;
   expirationDate: string | null;
   status: MedicationStatus;
   lastModifiedBy: string | null;
@@ -26,6 +27,7 @@ export interface MedicationFormValues {
   requiresPrescription: boolean;
   tags: string[];
   quantityPercent: number;
+  minQuantityPercent: number | null;
   expirationDate: string | null;
   status: MedicationStatus;
 }

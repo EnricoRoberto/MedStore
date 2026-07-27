@@ -163,6 +163,7 @@ export async function classifyPhotosWithAi(sessionId: string): Promise<number> {
         requiresPrescription: box.requiresPrescription ?? false,
         tags: [],
         quantityPercent: 100,
+        minQuantityPercent: null,
         expirationDate: box.expirationDate ?? null,
         status: "active",
       },

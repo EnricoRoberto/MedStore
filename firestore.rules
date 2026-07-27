@@ -20,6 +20,9 @@ service cloud.firestore {
         && data.tags is list
         && data.quantityPercent is number
         && data.quantityPercent >= 0 && data.quantityPercent <= 100
+        && (data.minQuantityPercent == null
+          || (data.minQuantityPercent is number
+            && data.minQuantityPercent >= 0 && data.minQuantityPercent <= 100))
         && data.status in ['active', 'archived']
         && (data.expirationDate == null || data.expirationDate is string)
         && data.photoRefs is list

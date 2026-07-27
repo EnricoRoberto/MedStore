@@ -13,6 +13,7 @@ import {
   useMedication,
   useMedicationPhotos,
 } from "../lib/medications";
+import { useNotificationThresholds } from "../lib/notificationThresholds";
 import type { MedicationFormValues, MedicationStatus } from "../types/medication";
 
 const emptyForm: MedicationFormValues = {
@@ -23,6 +24,7 @@ const emptyForm: MedicationFormValues = {
   requiresPrescription: false,
   tags: [],
   quantityPercent: 100,
+  minQuantityPercent: null,
   expirationDate: null,
   status: "active",
 };
@@ -34,6 +36,7 @@ export function MedicationFormPage() {
   const { user } = useAuth();
   const existing = useMedication(id);
   const photos = useMedicationPhotos(id);
+  const thresholds = useNotificationThresholds();
 
   const [form, setForm] = useState<MedicationFormValues>(emptyForm);
   const [saving, setSaving] = useState(false);
@@ -55,6 +58,7 @@ export function MedicationFormPage() {
         requiresPrescription: existing.requiresPrescription,
         tags: existing.tags,
         quantityPercent: existing.quantityPercent,
+        minQuantityPercent: existing.minQuantityPercent,
         expirationDate: existing.expirationDate,
         status: existing.status,
       });
@@ -162,7 +166,11 @@ export function MedicationFormPage() {
         onSubmit={(event) => void handleSubmit(event)}
         className="space-y-4 rounded-2xl border border-stone-200 bg-white p-5"
       >
-        <MedicationFields values={form} onChange={setForm} />
+        <MedicationFields
+          values={form}
+          onChange={setForm}
+          defaultMinQuantityPercent={thresholds.lowQuantityPercent}
+        />
 
         {!isNew && (
           <label className="block text-sm">

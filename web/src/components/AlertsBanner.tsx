@@ -17,11 +17,10 @@ export function AlertsBanner() {
     (m) => m.expirationDate && daysUntil(m.expirationDate) <= thresholds.expiringWithinDays,
   );
   const exhausted = active.filter((m) => m.quantityPercent <= thresholds.exhaustedPercent);
-  const low = active.filter(
-    (m) =>
-      m.quantityPercent > thresholds.exhaustedPercent &&
-      m.quantityPercent <= thresholds.lowQuantityPercent,
-  );
+  const low = active.filter((m) => {
+    const minThreshold = m.minQuantityPercent ?? thresholds.lowQuantityPercent;
+    return m.quantityPercent > thresholds.exhaustedPercent && m.quantityPercent <= minThreshold;
+  });
 
   if (expiring.length === 0 && exhausted.length === 0 && low.length === 0) {
     return null;
