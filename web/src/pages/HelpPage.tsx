@@ -27,7 +27,8 @@ const sections: Section[] = [
     body: [
       "Per ogni farmaco vengono registrati: produttore, nome, principio attivo, destinazione d'uso, obbligo o meno di ricetta medica, e i tag con i nomi delle persone che lo usano.",
       "Puoi correggere questi dati in qualsiasi momento cercando o selezionando il farmaco dalla schermata principale.",
-      "Un farmaco non si elimina mai: quando non è più in casa, impostane lo stato su \"Archiviato\" per toglierlo dall'uso corrente mantenendo comunque lo storico.",
+      "Se non è più in casa ma vuoi mantenerne lo storico, impostane lo stato su \"Archiviato\"; se invece vuoi rimuoverlo del tutto, usa \"Elimina farmaco\" nella sua scheda (richiede conferma). Dalla schermata principale puoi anche \"Svuota tutto\" l'inventario in un colpo solo, sempre con conferma: entrambe le azioni non sono reversibili.",
+      "Nella scheda di un farmaco già censito puoi aggiungere altre foto (es. il lato con la scadenza leggibile) e premere \"Affina con IA\" per far rileggere i dati al modello e pre-compilare i campi da rivedere prima di salvare, senza dover rifare una sessione di inventario completa.",
     ],
   },
   {
@@ -62,6 +63,7 @@ const sections: Section[] = [
     title: "Statistiche",
     body: [
       "La pagina Statistiche riassume l'inventario: numero di farmaci in uso e archiviati, da banco vs con ricetta, in scadenza o scaduti, con scorta bassa o esauriti, sessioni di inventario completate e quanti farmaci usa ciascuna persona.",
+      "In fondo alla pagina puoi condividere un report testuale dell'inventario attivo (nome, riempimento, scadenza e uso di ogni farmaco): \"Condividi\" apre il pannello di condivisione dello smartphone (WhatsApp, Messaggi, email, ecc.), oppure \"Invia via email\" apre direttamente un nuovo messaggio nel tuo client di posta.",
     ],
   },
   {
@@ -81,14 +83,14 @@ const sections: Section[] = [
 export function HelpPage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-slate-800">Guida a MedStore</h1>
+      <h1 className="text-xl font-semibold text-stone-800">Guida a MedStore</h1>
       {sections.map((section) => (
         <section
           key={section.title}
-          className="rounded-lg border border-slate-200 bg-white p-5"
+          className="rounded-2xl border border-stone-200 bg-white p-5"
         >
-          <h2 className="text-base font-semibold text-slate-800">{section.title}</h2>
-          <div className="mt-2 space-y-2 text-sm text-slate-600">
+          <h2 className="text-base font-semibold text-stone-800">{section.title}</h2>
+          <div className="mt-2 space-y-2 text-sm text-stone-600">
             {section.body.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}

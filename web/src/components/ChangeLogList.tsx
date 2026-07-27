@@ -23,23 +23,23 @@ export function ChangeLogList({ medicationId }: { medicationId: string }) {
   const entries = useChangeLog(medicationId);
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-5">
-      <h2 className="text-base font-semibold text-slate-800">Storico modifiche</h2>
+    <section className="rounded-2xl border border-stone-200 bg-white p-5">
+      <h2 className="text-base font-semibold text-stone-800">Storico modifiche</h2>
       {entries.length === 0 ? (
-        <p className="mt-2 text-sm text-slate-500">Nessuna modifica registrata.</p>
+        <p className="mt-2 text-sm text-stone-500">Nessuna modifica registrata.</p>
       ) : (
         <ul className="mt-3 space-y-3">
           {entries.map((entry) => (
             <li
               key={entry.id}
-              className="border-t border-slate-100 pt-3 text-sm first:border-t-0 first:pt-0"
+              className="border-t border-stone-100 pt-3 text-sm first:border-t-0 first:pt-0"
             >
-              <p className="text-slate-500">
+              <p className="text-stone-500">
                 {entry.changedAt?.toDate().toLocaleString("it-IT") ?? "…"} ·{" "}
                 {entry.changedBy ?? "sconosciuto"} ·{" "}
                 {entry.action === "create" ? "creazione" : "modifica"}
               </p>
-              <ul className="mt-1 space-y-0.5 text-slate-700">
+              <ul className="mt-1 space-y-0.5 text-stone-700">
                 {Object.entries(entry.changes).map(([field, change]) => (
                   <li key={field}>
                     <span className="font-medium">{FIELD_LABELS[field] ?? field}:</span>{" "}

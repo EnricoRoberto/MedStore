@@ -40,7 +40,7 @@ Questi passi vanno fatti manualmente in console — non sono automatizzabili da 
 
 Una volta completati questi passi, ogni push su `main` esegue automaticamente build e deploy tramite GitHub Actions (`.github/workflows/deploy.yml`).
 
-Nota: `web/public/icon-192.png` e `icon-512.png` sono placeholder a tinta unita (per rendere installabile la PWA da subito) — sostituiscili con l'icona reale dell'app quando disponibile.
+Logo: `web/src/assets/pharmacy-mark.svg` è la sorgente (croce da farmacia, verde salvia su crema); `web/public/favicon.svg`, `icon-192.png` e `icon-512.png` sono generati da quella sorgente.
 
 ### Nota sulla API key lato client
 
@@ -58,3 +58,5 @@ La API key Gemini è incorporata nel bundle JavaScript pubblico (necessario per 
 - [x] M8 — Pagina statistiche/report
 - [x] M9 — Rifinitura PWA, manuale utente completo, hardening rules
 - [x] Rimozione delle Cloud Functions per restare sul piano Firebase gratuito
+- [x] Rimozione di Cloud Storage (richiede Blaze): foto salvate come base64 in Firestore
+- [x] Restyling grafico (palette calda crema/terracotta/salvia, logo), eliminazione farmaco singolo/inventario completo, foto aggiuntive + affinamento IA su farmaci esistenti, report inventario condivisibile

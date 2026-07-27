@@ -22,20 +22,20 @@ export function InventorySessionsListPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-slate-800">Inventario</h1>
+        <h1 className="text-xl font-semibold text-stone-800">Inventario</h1>
         <button
           disabled={creating}
           onClick={() => void handleCreate()}
-          className="rounded-md bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
+          className="rounded-xl bg-terracotta-600 px-4 py-2 text-sm font-medium text-white hover:bg-terracotta-700 disabled:opacity-50"
         >
           + Nuova sessione
         </button>
       </div>
 
-      {sessions === null && <p className="text-sm text-slate-500">Caricamento…</p>}
+      {sessions === null && <p className="text-sm text-stone-500">Caricamento…</p>}
 
       {sessions !== null && sessions.length === 0 && (
-        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+        <p className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center text-sm text-stone-500">
           Nessuna sessione di inventario ancora. Avviane una per iniziare a censire i farmaci.
         </p>
       )}
@@ -45,15 +45,15 @@ export function InventorySessionsListPage() {
           <li key={session.id}>
             <Link
               to={`/inventario/${session.id}`}
-              className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 hover:border-teal-300 hover:shadow-sm"
+              className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white p-4 hover:border-terracotta-300 hover:shadow-sm"
             >
-              <span className="text-sm text-slate-700">
+              <span className="text-sm text-stone-700">
                 {session.startedAt?.toDate().toLocaleString("it-IT") ?? "In corso"}
               </span>
               <span
                 className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                   session.status === "completed"
-                    ? "bg-emerald-100 text-emerald-800"
+                    ? "bg-sage-100 text-sage-800"
                     : "bg-amber-100 text-amber-800"
                 }`}
               >

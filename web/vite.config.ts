@@ -18,8 +18,8 @@ export default defineConfig({
         short_name: "MedStore",
         description:
           "Inventario dei farmaci di casa: classificazione, giacenza, scadenze e notifiche.",
-        theme_color: "#0f766e",
-        background_color: "#f8fafc",
+        theme_color: "#c96a3a",
+        background_color: "#fdfaf5",
         display: "standalone",
         start_url: "/",
         icons: [

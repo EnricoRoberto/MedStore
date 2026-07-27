@@ -1,6 +1,8 @@
 import {
+  addDoc,
   arrayUnion,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   onSnapshot,
@@ -13,7 +15,13 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "./firebase";
-import type { ChangeLogEntry, Medication, MedicationFormValues } from "../types/medication";
+import { compressImageToDataUrl } from "./imageCompress";
+import type {
+  ChangeLogEntry,
+  Medication,
+  MedicationFormValues,
+  MedicationPhoto,
+} from "../types/medication";
 
 const MEDICATIONS_COLLECTION = "medications";
 
@@ -186,5 +194,59 @@ export async function updateMedication(
     });
   }
 
+  await batch.commit();
+}
+
+function photoFromDoc(snapshot: QueryDocumentSnapshot<DocumentData>): MedicationPhoto {
+  const data = snapshot.data();
+  return {
+    id: snapshot.id,
+    dataUrl: data.dataUrl ?? "",
+    uploadedAt: data.uploadedAt ?? null,
+    uploadedBy: data.uploadedBy ?? null,
+  };
+}
+
+export function useMedicationPhotos(medicationId: string | undefined): MedicationPhoto[] {
+  const [photos, setPhotos] = useState<MedicationPhoto[]>([]);
+
+  useEffect(() => {
+    if (!medicationId) {
+      setPhotos([]);
+      return;
+    }
+    const q = query(
+      collection(db, MEDICATIONS_COLLECTION, medicationId, "photos"),
+      orderBy("uploadedAt", "asc"),
+    );
+    return onSnapshot(q, (snapshot) => setPhotos(snapshot.docs.map(photoFromDoc)));
+  }, [medicationId]);
+
+  return photos;
+}
+
+export async function uploadMedicationPhoto(
+  medicationId: string,
+  file: File,
+  uploadedBy: string,
+): Promise<string> {
+  const dataUrl = await compressImageToDataUrl(file);
+  const docRef = await addDoc(collection(db, MEDICATIONS_COLLECTION, medicationId, "photos"), {
+    dataUrl,
+    uploadedAt: serverTimestamp(),
+    uploadedBy,
+  });
+  return docRef.id;
+}
+
+export async function deleteMedication(id: string): Promise<void> {
+  await deleteDoc(doc(db, MEDICATIONS_COLLECTION, id));
+}
+
+export async function deleteAllMedications(medications: Medication[]): Promise<void> {
+  const batch = writeBatch(db);
+  for (const medication of medications) {
+    batch.delete(doc(db, MEDICATIONS_COLLECTION, medication.id));
+  }
   await batch.commit();
 }

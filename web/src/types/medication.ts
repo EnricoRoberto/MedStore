@@ -30,6 +30,13 @@ export interface MedicationFormValues {
   status: MedicationStatus;
 }
 
+export interface MedicationPhoto {
+  id: string;
+  dataUrl: string;
+  uploadedAt: Timestamp | null;
+  uploadedBy: string | null;
+}
+
 export interface ChangeLogEntry {
   id: string;
   action: "create" | "update";

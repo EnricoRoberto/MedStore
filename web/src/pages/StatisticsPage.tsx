@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { StatCard } from "../components/StatCard";
 import { daysUntil } from "../lib/dates";
 import { useInventorySessions } from "../lib/inventorySessions";
 import { useMedications } from "../lib/medications";
+import { buildInventoryReportText } from "../lib/report";
 
 const EXPIRING_WITHIN_DAYS = 30;
 const LOW_QUANTITY_PERCENT = 20;
@@ -11,6 +12,7 @@ const EXHAUSTED_PERCENT = 5;
 export function StatisticsPage() {
   const medications = useMedications();
   const sessions = useInventorySessions();
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
 
   const stats = useMemo(() => {
     if (!medications) return null;
@@ -54,12 +56,37 @@ export function StatisticsPage() {
   const lastSession = completedSessions[0];
 
   if (!stats) {
-    return <p className="text-sm text-slate-500">Caricamento…</p>;
+    return <p className="text-sm text-stone-500">Caricamento…</p>;
+  }
+
+  const reportText = buildInventoryReportText(medications ?? []);
+  const mailtoHref = `mailto:?subject=${encodeURIComponent(
+    "Inventario farmaci MedStore",
+  )}&body=${encodeURIComponent(reportText)}`;
+
+  async function handleShareReport() {
+    const nav = navigator as Navigator & { share?: (data: ShareData) => Promise<void> };
+    if (nav.share) {
+      try {
+        await nav.share({ title: "Inventario farmaci MedStore", text: reportText });
+      } catch {
+        // annullato dall'utente: nessun errore da mostrare
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(reportText);
+      setShareMessage(
+        "Report copiato negli appunti: incollalo dove preferisci (WhatsApp, note, email…).",
+      );
+    } catch {
+      setShareMessage("Impossibile copiare automaticamente: seleziona e copia il testo qui sopra.");
+    }
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-slate-800">Statistiche</h1>
+      <h1 className="text-xl font-semibold text-stone-800">Statistiche</h1>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <StatCard label="Farmaci in uso" value={stats.totalActive} />
@@ -74,9 +101,9 @@ export function StatisticsPage() {
       </div>
 
       {stats.byPerson.length > 0 && (
-        <section className="rounded-lg border border-slate-200 bg-white p-5">
-          <h2 className="text-base font-semibold text-slate-800">Farmaci per persona</h2>
-          <ul className="mt-3 space-y-1 text-sm text-slate-700">
+        <section className="rounded-2xl border border-stone-200 bg-white p-5">
+          <h2 className="text-base font-semibold text-stone-800">Farmaci per persona</h2>
+          <ul className="mt-3 space-y-1 text-sm text-stone-700">
             {stats.byPerson.map(([person, count]) => (
               <li key={person} className="flex items-center justify-between">
                 <span>{person}</span>
@@ -88,11 +115,37 @@ export function StatisticsPage() {
       )}
 
       {lastSession && (
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-stone-500">
           Ultimo inventario completato:{" "}
           {lastSession.completedAt?.toDate().toLocaleDateString("it-IT") ?? "—"}
         </p>
       )}
+
+      <section className="space-y-3 rounded-2xl border border-stone-200 bg-white p-5">
+        <div>
+          <h2 className="text-base font-semibold text-stone-800">Report inventario</h2>
+          <p className="mt-1 text-sm text-stone-500">
+            Elenco dei farmaci attivi con riempimento, scadenza e destinazione d'uso, pronto da
+            condividere.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => void handleShareReport()}
+            className="rounded-xl bg-terracotta-600 px-4 py-2 text-sm font-medium text-white hover:bg-terracotta-700"
+          >
+            📤 Condividi (WhatsApp, ecc.)
+          </button>
+          <a
+            href={mailtoHref}
+            className="inline-flex items-center rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
+          >
+            ✉️ Invia via email
+          </a>
+        </div>
+        {shareMessage && <p className="text-sm text-sage-700">{shareMessage}</p>}
+      </section>
     </div>
   );
 }

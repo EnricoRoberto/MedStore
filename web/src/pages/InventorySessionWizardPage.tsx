@@ -68,12 +68,12 @@ export function InventorySessionWizardPage() {
   const rotationPhotos = photos.filter((p) => p.type === "rotation");
 
   if (session === undefined) {
-    return <p className="text-sm text-slate-500">Caricamento…</p>;
+    return <p className="text-sm text-stone-500">Caricamento…</p>;
   }
 
   if (session === null) {
     return (
-      <p className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+      <p className="rounded-2xl border border-dashed border-stone-300 bg-white p-8 text-center text-sm text-stone-500">
         Sessione di inventario non trovata.
       </p>
     );
@@ -87,8 +87,8 @@ export function InventorySessionWizardPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-xl font-semibold text-slate-800">Sessione di inventario</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-xl font-semibold text-stone-800">Sessione di inventario</h1>
+          <p className="mt-1 text-sm text-stone-500">
             {session.startedAt?.toDate().toLocaleDateString("it-IT") ?? "…"}
             {" – "}
             {session.completedAt?.toDate().toLocaleDateString("it-IT") ?? "…"}
@@ -96,14 +96,14 @@ export function InventorySessionWizardPage() {
         </div>
 
         <div className="flex flex-wrap gap-3 text-sm">
-          <span className="rounded-full bg-emerald-100 px-3 py-1 font-medium text-emerald-800">
+          <span className="rounded-full bg-sage-100 px-3 py-1 font-medium text-sage-800">
             {newCount} nuovi farmaci
           </span>
-          <span className="rounded-full bg-teal-100 px-3 py-1 font-medium text-teal-800">
+          <span className="rounded-full bg-terracotta-100 px-3 py-1 font-medium text-terracotta-800">
             {mergedCount} farmaci aggiornati
           </span>
           {unresolvedCount > 0 && (
-            <span className="rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-600">
+            <span className="rounded-full bg-stone-100 px-3 py-1 font-medium text-stone-600">
               {unresolvedCount} non completati
             </span>
           )}
@@ -111,20 +111,20 @@ export function InventorySessionWizardPage() {
 
         <ul className="space-y-2">
           {boxes.length === 0 && (
-            <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500">
+            <p className="rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center text-sm text-stone-500">
               Nessuna confezione registrata in questa sessione.
             </p>
           )}
           {boxes.map((box) => (
             <li
               key={box.id}
-              className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4"
+              className="flex items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-white p-4"
             >
               <div>
-                <p className="font-medium text-slate-800">
+                <p className="font-medium text-stone-800">
                   {box.classification?.name || box.label}
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-stone-500">
                   {box.classification?.producer || "Produttore sconosciuto"} ·{" "}
                   {STATUS_LABELS[box.status]}
                 </p>
@@ -138,7 +138,7 @@ export function InventorySessionWizardPage() {
                 {box.medicationId && (
                   <Link
                     to={`/farmaci/${box.medicationId}`}
-                    className="text-xs font-medium text-teal-700 hover:underline"
+                    className="text-xs font-medium text-terracotta-700 hover:underline"
                   >
                     Vedi farmaco
                   </Link>
@@ -270,22 +270,22 @@ export function InventorySessionWizardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-slate-800">Sessione di inventario</h1>
+        <h1 className="text-xl font-semibold text-stone-800">Sessione di inventario</h1>
         <button
           disabled={busy}
           onClick={() => sessionId && void completeInventorySession(sessionId)}
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+          className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 disabled:opacity-50"
         >
           Termina sessione
         </button>
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
-      {info && <p className="text-sm text-teal-700">{info}</p>}
+      {info && <p className="text-sm text-terracotta-700">{info}</p>}
 
-      <section className="rounded-lg border border-slate-200 bg-white p-5">
-        <h2 className="text-base font-semibold text-slate-800">1. Foto d'insieme</h2>
-        <p className="mt-1 text-sm text-slate-500">
+      <section className="rounded-2xl border border-stone-200 bg-white p-5">
+        <h2 className="text-base font-semibold text-stone-800">1. Foto d'insieme</h2>
+        <p className="mt-1 text-sm text-stone-500">
           Scatta una foto con tutte le confezioni disposte sul tavolo.
         </p>
         <input
@@ -299,9 +299,9 @@ export function InventorySessionWizardPage() {
         <PhotoThumbnails photos={generalPhotos} />
       </section>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-5">
-        <h2 className="text-base font-semibold text-slate-800">2. Foto delle confezioni girate</h2>
-        <p className="mt-1 text-sm text-slate-500">
+      <section className="rounded-2xl border border-stone-200 bg-white p-5">
+        <h2 className="text-base font-semibold text-stone-800">2. Foto delle confezioni girate</h2>
+        <p className="mt-1 text-sm text-stone-500">
           Gira le scatole per mostrare marca, produttore e scadenza, e scatta altre foto dello
           stesso gruppo.
         </p>
@@ -316,16 +316,16 @@ export function InventorySessionWizardPage() {
         <PhotoThumbnails photos={rotationPhotos} />
       </section>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-5">
+      <section className="rounded-2xl border border-stone-200 bg-white p-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-slate-800">3. Confezioni rilevate</h2>
+          <h2 className="text-base font-semibold text-stone-800">3. Confezioni rilevate</h2>
           {pendingCount > 0 && (
             <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
               {pendingCount} da completare
             </span>
           )}
         </div>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-stone-500">
           Fai analizzare le foto dall'IA per individuare le confezioni automaticamente, oppure
           aggiungine una manualmente se qualcuna non viene riconosciuta. Ogni confezione va poi
           classificata (o corretta) e confermata.
@@ -335,7 +335,7 @@ export function InventorySessionWizardPage() {
           <button
             disabled={classifying || generalPhotos.length === 0}
             onClick={() => void handleClassifyWithAi()}
-            className="rounded-md bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
+            className="rounded-xl bg-terracotta-600 px-4 py-2 text-sm font-medium text-white hover:bg-terracotta-700 disabled:opacity-50"
           >
             {classifying ? "Analisi in corso…" : "✨ Classifica con IA"}
           </button>
@@ -347,11 +347,11 @@ export function InventorySessionWizardPage() {
             value={newBoxLabel}
             onChange={(e) => setNewBoxLabel(e.target.value)}
             placeholder="Es. Scatola 1"
-            className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="flex-1 rounded-xl border border-stone-300 px-3 py-2 text-sm"
           />
           <button
             onClick={() => void handleAddBox()}
-            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+            className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
           >
             + Aggiungi manualmente
           </button>
@@ -359,20 +359,20 @@ export function InventorySessionWizardPage() {
 
         <ul className="mt-4 space-y-3">
           {boxes.length === 0 && (
-            <p className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+            <p className="rounded-2xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-500">
               Nessuna confezione aggiunta ancora.
             </p>
           )}
           {boxes.map((box) => {
             const isDone = box.status === "confirmed" || box.status === "merged_into_existing";
             return (
-              <li key={box.id} className="rounded-lg border border-slate-200 p-4">
+              <li key={box.id} className="rounded-2xl border border-stone-200 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="font-medium text-slate-800">
+                    <p className="font-medium text-stone-800">
                       {box.classification?.name || box.label}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-stone-500">
                       {STATUS_LABELS[box.status]}
                       {box.confidence !== null &&
                         ` · Confidenza IA: ${Math.round(box.confidence * 100)}%`}
@@ -382,7 +382,7 @@ export function InventorySessionWizardPage() {
                     {!isDone && (
                       <button
                         onClick={() => openClassification(box)}
-                        className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        className="rounded-xl border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-100"
                       >
                         {box.classification ? "Modifica classificazione" : "Classifica"}
                       </button>
@@ -400,8 +400,8 @@ export function InventorySessionWizardPage() {
                 </div>
 
                 {!isDone && (
-                  <div className="mt-3 border-t border-slate-100 pt-3">
-                    <p className="text-xs text-slate-500">
+                  <div className="mt-3 border-t border-stone-100 pt-3">
+                    <p className="text-xs text-stone-500">
                       Non si legge bene la scatola? Scatta una foto mirata:
                     </p>
                     <input
@@ -419,19 +419,19 @@ export function InventorySessionWizardPage() {
                 )}
 
                 {activeBoxId === box.id && (
-                  <div className="mt-3 space-y-4 rounded-md border border-teal-200 bg-teal-50/40 p-4">
+                  <div className="mt-3 space-y-4 rounded-xl border border-terracotta-200 bg-terracotta-50/40 p-4">
                     <MedicationFields values={draft} onChange={setDraft} />
                     <div className="flex gap-3">
                       <button
                         disabled={busy}
                         onClick={() => void saveClassification()}
-                        className="rounded-md bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
+                        className="rounded-xl bg-terracotta-600 px-4 py-2 text-sm font-medium text-white hover:bg-terracotta-700 disabled:opacity-50"
                       >
                         Salva classificazione
                       </button>
                       <button
                         onClick={() => setActiveBoxId(null)}
-                        className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                        className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
                       >
                         Annulla
                       </button>

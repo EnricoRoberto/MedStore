@@ -17,18 +17,18 @@ export function TagInput({ tags, onChange }: TagInputProps) {
   }
 
   return (
-    <div className="rounded-md border border-slate-300 p-2">
+    <div className="rounded-xl border border-stone-300 p-2">
       <div className="flex flex-wrap items-center gap-2">
         {tags.map((tag) => (
           <span
             key={tag}
-            className="inline-flex items-center gap-1 rounded-full bg-teal-100 px-2.5 py-1 text-xs font-medium text-teal-800"
+            className="inline-flex items-center gap-1 rounded-full bg-terracotta-100 px-2.5 py-1 text-xs font-medium text-terracotta-800"
           >
             {tag}
             <button
               type="button"
               onClick={() => onChange(tags.filter((t) => t !== tag))}
-              className="text-teal-600 hover:text-teal-900"
+              className="text-terracotta-600 hover:text-terracotta-900"
               aria-label={`Rimuovi tag ${tag}`}
             >
               ×

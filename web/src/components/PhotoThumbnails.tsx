@@ -13,7 +13,7 @@ export function PhotoThumbnails({ photos }: { photos: Thumbnail[] }) {
           key={photo.id}
           src={photo.dataUrl}
           alt=""
-          className="h-16 w-16 rounded-md border border-slate-200 object-cover"
+          className="h-16 w-16 rounded-xl border border-stone-200 object-cover"
         />
       ))}
     </div>
