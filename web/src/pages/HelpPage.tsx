@@ -57,6 +57,7 @@ const sections: Section[] = [
     title: "Avvisi",
     body: [
       "Quando apri MedStore, se c'è qualcosa che richiede attenzione (un farmaco in scadenza, con scorta bassa o esaurito) compare un banner in alto con il riepilogo, in base a soglie configurabili (default: entro 30 giorni dalla scadenza, quantità bassa sotto il 20%, esaurita sotto il 5%).",
+      "Nella scheda di ogni farmaco puoi impostare una \"Scorta minima desiderata\" personalizzata: se la lasci vuota vale la soglia generale del 20%, altrimenti quel farmaco specifico segnala scorta bassa in base alla percentuale che hai scelto tu (utile per farmaci che vuoi tenere sempre ben forniti).",
       "Non essendoci un servizio sempre attivo in background, l'avviso si aggiorna ogni volta che apri l'app: non è una notifica push del telefono, ma un promemoria visibile appena la apri.",
     ],
   },

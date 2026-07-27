@@ -5,9 +5,14 @@ import type { MedicationFormValues } from "../types/medication";
 interface MedicationFieldsProps {
   values: MedicationFormValues;
   onChange: (values: MedicationFormValues) => void;
+  defaultMinQuantityPercent?: number;
 }
 
-export function MedicationFields({ values, onChange }: MedicationFieldsProps) {
+export function MedicationFields({
+  values,
+  onChange,
+  defaultMinQuantityPercent,
+}: MedicationFieldsProps) {
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -90,6 +95,32 @@ export function MedicationFields({ values, onChange }: MedicationFieldsProps) {
         <div className="mt-1">
           <QuantityBar percent={values.quantityPercent} />
         </div>
+      </label>
+
+      <label className="block text-sm">
+        <span className="font-medium text-stone-700">Scorta minima desiderata (%)</span>
+        <input
+          type="number"
+          min={0}
+          max={100}
+          value={values.minQuantityPercent ?? ""}
+          placeholder={
+            defaultMinQuantityPercent !== undefined
+              ? `Default attuale: ${defaultMinQuantityPercent}%`
+              : "Usa la soglia generale"
+          }
+          onChange={(e) =>
+            onChange({
+              ...values,
+              minQuantityPercent: e.target.value === "" ? null : Number(e.target.value),
+            })
+          }
+          className="mt-1 w-full rounded-xl border border-stone-300 px-3 py-2 text-sm sm:max-w-xs"
+        />
+        <p className="mt-1 text-xs text-stone-500">
+          Sotto questa soglia l'avviso "scorta bassa" scatta specificamente per questo farmaco.
+          Lascia vuoto per usare la soglia generale delle Statistiche.
+        </p>
       </label>
     </>
   );

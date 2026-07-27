@@ -14,25 +14,11 @@ export function AppShell() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-cream-50">
       <header className="overflow-x-hidden border-b border-stone-200 bg-white">
-        <div className="mx-auto flex max-w-4xl items-center gap-4 px-4 py-3">
+        <div className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 pt-3">
           <span className="flex shrink-0 items-center gap-2 text-lg font-semibold text-terracotta-700">
             <img src="/favicon.svg" alt="" className="h-7 w-7" />
             MedStore
           </span>
-          <nav className="flex flex-1 items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <NavLink to="/" end className={navLinkClass}>
-              Farmaci
-            </NavLink>
-            <NavLink to="/inventario" className={navLinkClass}>
-              Inventario
-            </NavLink>
-            <NavLink to="/statistiche" className={navLinkClass}>
-              Statistiche
-            </NavLink>
-            <NavLink to="/guida" className={navLinkClass}>
-              Guida
-            </NavLink>
-          </nav>
           <div className="flex shrink-0 items-center gap-3">
             {user?.photoURL && (
               <img src={user.photoURL} alt="" className="h-8 w-8 rounded-full" />
@@ -48,6 +34,20 @@ export function AppShell() {
             </button>
           </div>
         </div>
+        <nav className="mx-auto flex max-w-4xl items-center gap-2 overflow-x-auto px-4 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <NavLink to="/" end className={navLinkClass}>
+            Farmaci
+          </NavLink>
+          <NavLink to="/inventario" className={navLinkClass}>
+            Inventario
+          </NavLink>
+          <NavLink to="/statistiche" className={navLinkClass}>
+            Statistiche
+          </NavLink>
+          <NavLink to="/guida" className={navLinkClass}>
+            Guida
+          </NavLink>
+        </nav>
       </header>
       <AlertsBanner />
       <main className="mx-auto max-w-4xl px-4 py-6">

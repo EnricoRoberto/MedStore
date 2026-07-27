@@ -33,6 +33,7 @@ const TRACKED_FIELDS = [
   "requiresPrescription",
   "tags",
   "quantityPercent",
+  "minQuantityPercent",
   "expirationDate",
   "status",
 ] as const;
@@ -69,6 +70,7 @@ function fromDoc(snapshot: QueryDocumentSnapshot<DocumentData>): Medication {
     requiresPrescription: data.requiresPrescription ?? false,
     tags: data.tags ?? [],
     quantityPercent: data.quantityPercent ?? 0,
+    minQuantityPercent: data.minQuantityPercent ?? null,
     expirationDate: data.expirationDate ?? null,
     status: data.status ?? "active",
     lastModifiedBy: data.lastModifiedBy ?? null,
