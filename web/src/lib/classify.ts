@@ -121,7 +121,9 @@ export async function classifyPhotosWithAi(sessionId: string): Promise<number> {
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    // Alias mantenuto da Google che punta sempre al modello Flash corrente,
+    // invece di una versione fissa che verrebbe dismessa nel giro di mesi.
+    model: "gemini-flash-latest",
     generationConfig: { responseMimeType: "application/json", responseSchema },
   });
 
