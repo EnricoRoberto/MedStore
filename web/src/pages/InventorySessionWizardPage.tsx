@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { BoxConfirmActions } from "../components/BoxConfirmActions";
 import { MedicationFields } from "../components/MedicationFields";
 import { PhotoThumbnails } from "../components/PhotoThumbnails";
 import { QuantityBar } from "../components/QuantityBar";
 import { useAuth } from "../lib/auth";
-import { classifyPhotosWithAi } from "../lib/classify";
+import { classifyPhotosWithAi, refineMedicationWithAi } from "../lib/classify";
 import {
   addDetectedBox,
   classifyBox,
@@ -63,6 +63,9 @@ export function InventorySessionWizardPage() {
   const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [classifying, setClassifying] = useState(false);
+  const [refiningBoxId, setRefiningBoxId] = useState<string | null>(null);
+  const generalInputRef = useRef<HTMLInputElement>(null);
+  const rotationInputRef = useRef<HTMLInputElement>(null);
 
   const editorLabel = user?.email ?? "sconosciuto";
   const generalPhotos = photos.filter((p) => p.type === "general");
@@ -214,6 +217,28 @@ export function InventorySessionWizardPage() {
     setDraft(box.classification ?? emptyClassification);
   }
 
+  // Rilegge con l'IA tutte le foto già collegate a questa confezione (foto
+  // d'insieme, girate e mirate insieme): utile dopo aver aggiunto una foto
+  // mirata che mostra un dato prima illeggibile (es. la data di scadenza),
+  // senza dover creare una nuova confezione separata per la stessa scatola.
+  async function handleRefineBoxWithAi(box: DetectedBox) {
+    const linkedPhotos = boxPhotos(box, photos);
+    if (linkedPhotos.length === 0) return;
+    setRefiningBoxId(box.id);
+    setError(null);
+    setInfo(null);
+    try {
+      const refined = await refineMedicationWithAi(linkedPhotos.map((p) => p.dataUrl));
+      setActiveBoxId(box.id);
+      setDraft({ ...(box.classification ?? emptyClassification), ...refined });
+      setInfo("Dati aggiornati dall'IA: controllali e premi Salva classificazione per confermarli.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Rianalisi IA non riuscita.");
+    } finally {
+      setRefiningBoxId(null);
+    }
+  }
+
   async function saveClassification() {
     if (!sessionId || !activeBoxId) return;
     if (!draft.name.trim()) {
@@ -287,16 +312,27 @@ export function InventorySessionWizardPage() {
       <section className="rounded-2xl border border-stone-200 bg-white p-5">
         <h2 className="text-base font-semibold text-stone-800">1. Foto d'insieme</h2>
         <p className="mt-1 text-sm text-stone-500">
-          Scatta una foto con tutte le confezioni disposte sul tavolo.
+          Scatta una foto con le confezioni disposte sul tavolo. Se non entrano tutte
+          nell'inquadratura, va benissimo: scattane quante ne servono, l'IA le analizza tutte
+          insieme.
         </p>
         <input
+          ref={generalInputRef}
           type="file"
           accept="image/*"
           capture="environment"
           multiple
           onChange={(e) => void handleUpload(e.target.files, "general")}
-          className="mt-3 text-sm"
+          className="hidden"
         />
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => generalInputRef.current?.click()}
+          className="mt-3 rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 disabled:opacity-50"
+        >
+          {generalPhotos.length === 0 ? "📷 Scatta foto d'insieme" : "+ Aggiungi un'altra foto d'insieme"}
+        </button>
         <PhotoThumbnails photos={generalPhotos} />
       </section>
 
@@ -304,16 +340,25 @@ export function InventorySessionWizardPage() {
         <h2 className="text-base font-semibold text-stone-800">2. Foto delle confezioni girate</h2>
         <p className="mt-1 text-sm text-stone-500">
           Gira le scatole per mostrare marca, produttore e scadenza, e scatta altre foto dello
-          stesso gruppo.
+          stesso gruppo (anche qui, quante te ne servono).
         </p>
         <input
+          ref={rotationInputRef}
           type="file"
           accept="image/*"
           capture="environment"
           multiple
           onChange={(e) => void handleUpload(e.target.files, "rotation")}
-          className="mt-3 text-sm"
+          className="hidden"
         />
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => rotationInputRef.current?.click()}
+          className="mt-3 rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100 disabled:opacity-50"
+        >
+          {rotationPhotos.length === 0 ? "📷 Scatta foto girate" : "+ Aggiungi un'altra foto"}
+        </button>
         <PhotoThumbnails photos={rotationPhotos} />
       </section>
 
@@ -416,6 +461,16 @@ export function InventorySessionWizardPage() {
                     <PhotoThumbnails
                       photos={photos.filter((p) => p.type === "targeted" && p.boxId === box.id)}
                     />
+                    <button
+                      type="button"
+                      disabled={refiningBoxId === box.id}
+                      onClick={() => void handleRefineBoxWithAi(box)}
+                      className="mt-2 rounded-xl bg-sage-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-sage-700 disabled:opacity-50"
+                    >
+                      {refiningBoxId === box.id
+                        ? "Analisi in corso…"
+                        : "✨ Rianalizza con IA (tutte le foto di questa confezione)"}
+                    </button>
                   </div>
                 )}
 

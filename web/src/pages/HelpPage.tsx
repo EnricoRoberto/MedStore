@@ -14,10 +14,10 @@ const sections: Section[] = [
   {
     title: "Acquisizione tramite foto",
     body: [
-      "Dalla sezione Inventario avvia una nuova sessione, disponi le confezioni su un tavolo e scatta una prima foto d'insieme di tutto il gruppo.",
-      "Gira le scatole per mostrare gli altri lati (marca, produttore, data di scadenza) e scatta altre foto dello stesso gruppo.",
-      "Premi \"Classifica con IA\" per far analizzare le foto: il sistema individua le confezioni, correla le foto che mostrano la stessa scatola da angolazioni diverse ed estrae produttore, nome, principio attivo, destinazione d'uso, obbligo di ricetta e scadenza, con un livello di confidenza.",
-      "Le confezioni con confidenza bassa o non riconosciute restano segnalate: scatta una foto mirata aggiuntiva per quella specifica confezione, oppure classificala e completane i dati manualmente. Puoi anche aggiungere una confezione a mano in qualsiasi momento se l'IA non la individua.",
+      "Dalla sezione Inventario avvia una nuova sessione, disponi le confezioni su un tavolo e scatta una o più foto d'insieme del gruppo: se non entrano tutte in un'unica inquadratura, scattane quante ne servono premendo \"+ Aggiungi un'altra foto d'insieme\".",
+      "Gira le scatole per mostrare gli altri lati (marca, produttore, data di scadenza) e scatta altre foto dello stesso gruppo, anche qui quante servono.",
+      "Premi \"Classifica con IA\" per far analizzare tutte le foto insieme: il sistema individua ogni confezione fisica distinta, correla le foto che mostrano la stessa scatola da angolazioni diverse (anche tra foto d'insieme e foto girate) ed estrae produttore, nome, principio attivo, destinazione d'uso, obbligo di ricetta e scadenza, con un livello di confidenza.",
+      "Le confezioni con confidenza bassa o non riconosciute restano segnalate: scatta una foto mirata aggiuntiva per quella specifica confezione (es. per farle leggere la scadenza), poi premi \"✨ Rianalizza con IA\" sotto quella confezione per far rileggere al modello tutte le sue foto insieme (senza creare una confezione duplicata), oppure classificala e completane i dati manualmente. Puoi anche aggiungere una confezione a mano in qualsiasi momento se l'IA non la individua.",
       "Per ogni confezione classificata, conferma se è un farmaco nuovo o l'aggiornamento di uno già censito (in questo caso ne aggiorna quantità e dati) prima che entri in inventario.",
       "Puoi terminare la sessione in qualsiasi momento, anche con alcune confezioni non completate: resteranno segnalate ma la sessione diventa un riepilogo di sola lettura consultabile in seguito.",
     ],
@@ -80,6 +80,7 @@ const sections: Section[] = [
     title: "Accesso",
     body: [
       "L'accesso è riservato ai familiari autorizzati tramite Google Sign-In. Se il tuo account non è in whitelist, contatta chi amministra l'app per farti aggiungere.",
+      "In alto a destra, quando c'è almeno un altro utente collegato, compare un'indicazione \"N online\": è solo informativa e approssimata (aggiornata ogni minuto circa), utile per sapere se qualcun altro sta usando l'app in questo momento.",
     ],
   },
 ];
