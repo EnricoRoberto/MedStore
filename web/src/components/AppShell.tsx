@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../lib/auth";
+import { useHeartbeat, useOnlineUsersCount } from "../lib/presence";
 import { AlertsBanner } from "./AlertsBanner";
 
 function navLinkClass({ isActive }: { isActive: boolean }) {
@@ -10,6 +11,8 @@ function navLinkClass({ isActive }: { isActive: boolean }) {
 
 export function AppShell() {
   const { user, signOut } = useAuth();
+  useHeartbeat(user?.uid, user?.email);
+  const onlineCount = useOnlineUsersCount();
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-cream-50">
@@ -20,6 +23,15 @@ export function AppShell() {
             MedStore
           </span>
           <div className="flex shrink-0 items-center gap-3">
+            {onlineCount > 0 && (
+              <span
+                className="hidden items-center gap-1 text-xs text-stone-500 sm:inline-flex"
+                title="Utenti collegati nell'app negli ultimi 2 minuti"
+              >
+                <span className="h-2 w-2 rounded-full bg-sage-500" />
+                {onlineCount} online
+              </span>
+            )}
             {user?.photoURL && (
               <img src={user.photoURL} alt="" className="h-8 w-8 rounded-full" />
             )}

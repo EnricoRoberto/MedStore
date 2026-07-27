@@ -104,5 +104,15 @@ service cloud.firestore {
       allow read: if isAllowlisted();
       allow write: if isAllowlisted();
     }
+
+    function isValidPresence(data) {
+      return data.lastSeen is timestamp
+        && (data.email == null || data.email is string);
+    }
+
+    match /presence/{uid} {
+      allow read: if isAllowlisted();
+      allow write: if isAllowlisted() && request.auth.uid == uid && isValidPresence(request.resource.data);
+    }
   }
 }

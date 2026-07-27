@@ -80,6 +80,7 @@ const sections: Section[] = [
     title: "Accesso",
     body: [
       "L'accesso è riservato ai familiari autorizzati tramite Google Sign-In. Se il tuo account non è in whitelist, contatta chi amministra l'app per farti aggiungere.",
+      "In alto a destra, quando c'è almeno un altro utente collegato, compare un'indicazione \"N online\": è solo informativa e approssimata (aggiornata ogni minuto circa), utile per sapere se qualcun altro sta usando l'app in questo momento.",
     ],
   },
 ];
