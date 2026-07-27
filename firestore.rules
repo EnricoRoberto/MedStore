@@ -36,6 +36,10 @@ service cloud.firestore {
         && data.dataUrl.size() < 900000;
     }
 
+    function isValidMedicationPhoto(data) {
+      return data.dataUrl is string && data.dataUrl.size() < 900000;
+    }
+
     function isValidDetectedBox(data) {
       return data.label is string
         && data.photoIds is list
@@ -58,12 +62,18 @@ service cloud.firestore {
     match /medications/{medicationId} {
       allow read: if isAllowlisted();
       allow create, update: if isAllowlisted() && isValidMedication(request.resource.data);
-      allow delete: if false;
+      allow delete: if isAllowlisted();
 
       match /changeLog/{logId} {
         allow read, create: if isAllowlisted();
         // Nessuna Cloud Function di audit: il client scrive farmaco e log
         // dello stesso cambiamento nello stesso batch (vedi lib/medications.ts).
+        allow update, delete: if false;
+      }
+
+      match /photos/{photoId} {
+        allow read: if isAllowlisted();
+        allow create: if isAllowlisted() && isValidMedicationPhoto(request.resource.data);
         allow update, delete: if false;
       }
     }

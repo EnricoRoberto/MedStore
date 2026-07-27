@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 import type { BoxStatus } from "../types/inventorySession";
+import type { MedicationFormValues } from "../types/medication";
 
 const SESSIONS_COLLECTION = "inventorySessions";
 const CONFIDENCE_THRESHOLD = 0.6;
@@ -174,4 +175,76 @@ export async function classifyPhotosWithAi(sessionId: string): Promise<number> {
   await batch.commit();
 
   return boxesCreated;
+}
+
+const REFINE_PROMPT = `Sei un assistente che analizza foto di una confezione di farmaco già censita in un inventario, per affinarne i dati. Analizza tutte le foto fornite (stessa confezione, angolazioni diverse) ed estrai: produttore, nome del farmaco, principio attivo, destinazione d'uso, se richiede prescrizione medica (contesto Italia: es. molti antidolorifici/antinfiammatori da banco non la richiedono, gli antibiotici sì), e data di scadenza se leggibile in formato YYYY-MM-DD altrimenti null.
+
+Se un dato non è leggibile in nessuna foto, lascia il campo testuale vuoto invece di inventarlo. Rispondi solo con il JSON richiesto.`;
+
+const refineSchema: Schema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    producer: { type: SchemaType.STRING },
+    name: { type: SchemaType.STRING },
+    activeIngredient: { type: SchemaType.STRING },
+    indication: { type: SchemaType.STRING },
+    requiresPrescription: { type: SchemaType.BOOLEAN },
+    expirationDate: { type: SchemaType.STRING, nullable: true },
+  },
+  required: ["producer", "name", "activeIngredient", "indication", "requiresPrescription"],
+};
+
+interface RefinedFields {
+  producer?: string;
+  name?: string;
+  activeIngredient?: string;
+  indication?: string;
+  requiresPrescription?: boolean;
+  expirationDate?: string | null;
+}
+
+// Affina i dati di un farmaco già censito a partire dalle sue foto (esistenti
+// + eventuali nuove), invece di individuare confezioni multiple come
+// classifyPhotosWithAi: qui si conosce già il farmaco, serve solo migliorarne
+// i campi.
+export async function refineMedicationWithAi(
+  dataUrls: string[],
+): Promise<Partial<MedicationFormValues>> {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("VITE_GEMINI_API_KEY non configurata.");
+  }
+  if (dataUrls.length === 0) {
+    throw new Error("Nessuna foto disponibile da analizzare.");
+  }
+
+  const imageParts = dataUrls.map((dataUrl) => ({ inlineData: inlineDataFromDataUrl(dataUrl) }));
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-flash-latest",
+    generationConfig: { responseMimeType: "application/json", responseSchema: refineSchema },
+  });
+
+  const result = await model.generateContent({
+    contents: [{ role: "user", parts: [{ text: REFINE_PROMPT }, ...imageParts] }],
+  });
+
+  let parsed: RefinedFields;
+  try {
+    parsed = JSON.parse(result.response.text());
+  } catch {
+    throw new Error("Risposta del modello non interpretabile.");
+  }
+
+  const refined: Partial<MedicationFormValues> = {};
+  if (parsed.producer) refined.producer = parsed.producer;
+  if (parsed.name) refined.name = parsed.name;
+  if (parsed.activeIngredient) refined.activeIngredient = parsed.activeIngredient;
+  if (parsed.indication) refined.indication = parsed.indication;
+  if (typeof parsed.requiresPrescription === "boolean") {
+    refined.requiresPrescription = parsed.requiresPrescription;
+  }
+  if (parsed.expirationDate) refined.expirationDate = parsed.expirationDate;
+  return refined;
 }
