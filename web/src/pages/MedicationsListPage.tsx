@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { QuantityBar } from "../components/QuantityBar";
 import { deleteAllMedications, useMedications } from "../lib/medications";
+import { getMedicationBadge } from "../lib/medicationStatus";
+import { useNotificationThresholds } from "../lib/notificationThresholds";
 import type { Medication } from "../types/medication";
 
 function matchesSearch(medication: Medication, term: string): boolean {
@@ -20,6 +22,7 @@ function matchesSearch(medication: Medication, term: string): boolean {
 
 export function MedicationsListPage() {
   const medications = useMedications();
+  const thresholds = useNotificationThresholds();
   const [search, setSearch] = useState("");
   const [clearing, setClearing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,34 +95,49 @@ export function MedicationsListPage() {
       )}
 
       <ul className="space-y-2">
-        {filtered.map((medication) => (
-          <li key={medication.id}>
-            <Link
-              to={`/farmaci/${medication.id}`}
-              className="block rounded-2xl border border-stone-200 bg-white p-4 hover:border-terracotta-300 hover:shadow-sm"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-medium text-stone-800">
-                    {medication.name}
-                    {medication.status === "archived" && (
-                      <span className="ml-2 rounded bg-stone-100 px-1.5 py-0.5 text-xs font-normal text-stone-500">
-                        Archiviato
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-sm text-stone-500">
-                    {medication.producer || "Produttore sconosciuto"}
-                    {medication.tags.length > 0 && ` · ${medication.tags.join(", ")}`}
-                  </p>
+        {filtered.map((medication) => {
+          const badge =
+            medication.status === "active" ? getMedicationBadge(medication, thresholds) : null;
+          return (
+            <li key={medication.id}>
+              <Link
+                to={`/farmaci/${medication.id}`}
+                className="block rounded-2xl border border-stone-200 bg-white p-4 hover:border-terracotta-300 hover:shadow-sm"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-medium text-stone-800">
+                      {medication.name}
+                      {medication.status === "archived" && (
+                        <span className="ml-2 rounded bg-stone-100 px-1.5 py-0.5 text-xs font-normal text-stone-500">
+                          Archiviato
+                        </span>
+                      )}
+                      {badge && (
+                        <span
+                          className={`ml-2 rounded-full px-1.5 py-0.5 text-xs font-medium ${
+                            badge.tone === "red"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-amber-100 text-amber-800"
+                          }`}
+                        >
+                          {badge.label}
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-sm text-stone-500">
+                      {medication.producer || "Produttore sconosciuto"}
+                      {medication.tags.length > 0 && ` · ${medication.tags.join(", ")}`}
+                    </p>
+                  </div>
+                  <div className="w-32 shrink-0">
+                    <QuantityBar percent={medication.quantityPercent} />
+                  </div>
                 </div>
-                <div className="w-32 shrink-0">
-                  <QuantityBar percent={medication.quantityPercent} />
-                </div>
-              </div>
-            </Link>
-          </li>
-        ))}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

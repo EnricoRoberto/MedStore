@@ -241,6 +241,24 @@ export async function uploadMedicationPhoto(
   return docRef.id;
 }
 
+// Copia le foto già scattate durante una sessione di inventario nella
+// sottocollezione foto del farmaco, così sono visibili e riusabili da
+// "Affina con IA" sulla scheda del farmaco senza doverle rifotografare:
+// altrimenti resterebbero solo negli ID salvati in photoRefs, senza un modo
+// per visualizzarle di nuovo.
+export async function copyPhotosToMedication(
+  medicationId: string,
+  dataUrls: string[],
+  uploadedBy: string,
+): Promise<void> {
+  const batch = writeBatch(db);
+  for (const dataUrl of dataUrls) {
+    const photoRef = doc(collection(db, MEDICATIONS_COLLECTION, medicationId, "photos"));
+    batch.set(photoRef, { dataUrl, uploadedAt: serverTimestamp(), uploadedBy });
+  }
+  await batch.commit();
+}
+
 export async function deleteMedication(id: string): Promise<void> {
   await deleteDoc(doc(db, MEDICATIONS_COLLECTION, id));
 }
