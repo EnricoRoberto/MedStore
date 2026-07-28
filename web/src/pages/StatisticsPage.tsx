@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { StatCard } from "../components/StatCard";
 import { useInventorySessions } from "../lib/inventorySessions";
 import { useMedications } from "../lib/medications";
-import { isExhausted, isExpired, isExpiringSoon, isLowStock } from "../lib/medicationStatus";
+import { filterMedicationsByStat } from "../lib/medicationStatus";
 import { useNotificationThresholds } from "../lib/notificationThresholds";
 import { buildInventoryReportText } from "../lib/report";
 
@@ -16,12 +17,11 @@ export function StatisticsPage() {
     if (!medications) return null;
 
     const active = medications.filter((m) => m.status === "active");
-    const archived = medications.filter((m) => m.status === "archived");
-    const expired = active.filter((m) => isExpired(m));
-    const expiringSoon = active.filter((m) => isExpiringSoon(m, thresholds));
-    const exhausted = active.filter((m) => isExhausted(m, thresholds));
-    const low = active.filter((m) => isLowStock(m, thresholds));
-    const requiresPrescription = active.filter((m) => m.requiresPrescription).length;
+    const requiresPrescription = filterMedicationsByStat(
+      medications,
+      "prescription",
+      thresholds,
+    ).length;
 
     const byPerson = new Map<string, number>();
     for (const medication of active) {
@@ -32,13 +32,13 @@ export function StatisticsPage() {
 
     return {
       totalActive: active.length,
-      totalArchived: archived.length,
-      expired: expired.length,
-      expiringSoon: expiringSoon.length,
-      exhausted: exhausted.length,
-      low: low.length,
+      totalArchived: filterMedicationsByStat(medications, "archived", thresholds).length,
+      expired: filterMedicationsByStat(medications, "expired", thresholds).length,
+      expiringSoon: filterMedicationsByStat(medications, "expiringSoon", thresholds).length,
+      exhausted: filterMedicationsByStat(medications, "exhausted", thresholds).length,
+      low: filterMedicationsByStat(medications, "low", thresholds).length,
       requiresPrescription,
-      otc: active.length - requiresPrescription,
+      otc: filterMedicationsByStat(medications, "otc", thresholds).length,
       byPerson: Array.from(byPerson.entries()).sort((a, b) => b[1] - a[1]),
     };
   }, [medications, thresholds]);
@@ -80,25 +80,58 @@ export function StatisticsPage() {
       <h1 className="text-xl font-semibold text-stone-800">Statistiche</h1>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <StatCard label="Farmaci in uso" value={stats.totalActive} />
-        <StatCard label="Farmaci archiviati" value={stats.totalArchived} />
-        <StatCard label="Da banco" value={stats.otc} />
-        <StatCard label="Con ricetta" value={stats.requiresPrescription} />
-        <StatCard label="In scadenza (30gg)" value={stats.expiringSoon} tone="amber" />
-        <StatCard label="Scaduti" value={stats.expired} tone="red" />
-        <StatCard label="Scorta bassa" value={stats.low} tone="amber" />
-        <StatCard label="Esauriti" value={stats.exhausted} tone="red" />
-        <StatCard label="Sessioni di inventario" value={completedSessions.length} />
+        <StatCard label="Farmaci in uso" value={stats.totalActive} to="/statistiche/dettaglio?filter=active" />
+        <StatCard
+          label="Farmaci archiviati"
+          value={stats.totalArchived}
+          to="/statistiche/dettaglio?filter=archived"
+        />
+        <StatCard label="Da banco" value={stats.otc} to="/statistiche/dettaglio?filter=otc" />
+        <StatCard
+          label="Con ricetta"
+          value={stats.requiresPrescription}
+          to="/statistiche/dettaglio?filter=prescription"
+        />
+        <StatCard
+          label="In scadenza (30gg)"
+          value={stats.expiringSoon}
+          tone="amber"
+          to="/statistiche/dettaglio?filter=expiringSoon"
+        />
+        <StatCard
+          label="Scaduti"
+          value={stats.expired}
+          tone="red"
+          to="/statistiche/dettaglio?filter=expired"
+        />
+        <StatCard
+          label="Scorta bassa"
+          value={stats.low}
+          tone="amber"
+          to="/statistiche/dettaglio?filter=low"
+        />
+        <StatCard
+          label="Esauriti"
+          value={stats.exhausted}
+          tone="red"
+          to="/statistiche/dettaglio?filter=exhausted"
+        />
+        <StatCard label="Sessioni di inventario" value={completedSessions.length} to="/inventario" />
       </div>
 
       {stats.byPerson.length > 0 && (
-        <section className="rounded-2xl border border-stone-200 bg-white p-5">
+        <section className="rounded-2xl border-2 border-stone-400 bg-white p-5 shadow-md">
           <h2 className="text-base font-semibold text-stone-800">Farmaci per persona</h2>
           <ul className="mt-3 space-y-1 text-sm text-stone-700">
             {stats.byPerson.map(([person, count]) => (
-              <li key={person} className="flex items-center justify-between">
-                <span>{person}</span>
-                <span className="font-medium">{count}</span>
+              <li key={person}>
+                <Link
+                  to={`/statistiche/dettaglio?person=${encodeURIComponent(person)}`}
+                  className="flex items-center justify-between rounded-lg px-2 py-1 hover:bg-stone-100"
+                >
+                  <span>{person}</span>
+                  <span className="font-medium">{count}</span>
+                </Link>
               </li>
             ))}
           </ul>

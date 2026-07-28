@@ -42,3 +42,57 @@ export function getMedicationBadge(
   if (isLowStock(medication, thresholds)) return { label: "Scorta bassa", tone: "amber" };
   return null;
 }
+
+export type StatFilterKey =
+  | "active"
+  | "archived"
+  | "otc"
+  | "prescription"
+  | "expiringSoon"
+  | "expired"
+  | "low"
+  | "exhausted";
+
+export const STAT_FILTER_LABELS: Record<StatFilterKey, string> = {
+  active: "Farmaci in uso",
+  archived: "Farmaci archiviati",
+  otc: "Farmaci da banco",
+  prescription: "Farmaci con ricetta",
+  expiringSoon: "Farmaci in scadenza",
+  expired: "Farmaci scaduti",
+  low: "Farmaci con scorta bassa",
+  exhausted: "Farmaci esauriti",
+};
+
+// Stessa logica di filtro usata per i conteggi in Statistiche, riusata anche
+// per la pagina di dettaglio aperta cliccando un riquadro: un'unica fonte di
+// verità evita che i due punti si disallineino nel tempo.
+export function filterMedicationsByStat(
+  medications: Medication[],
+  key: StatFilterKey,
+  thresholds: NotificationThresholds,
+): Medication[] {
+  const active = medications.filter((m) => m.status === "active");
+  switch (key) {
+    case "active":
+      return active;
+    case "archived":
+      return medications.filter((m) => m.status === "archived");
+    case "otc":
+      return active.filter((m) => !m.requiresPrescription);
+    case "prescription":
+      return active.filter((m) => m.requiresPrescription);
+    case "expiringSoon":
+      return active.filter((m) => isExpiringSoon(m, thresholds));
+    case "expired":
+      return active.filter((m) => isExpired(m));
+    case "low":
+      return active.filter((m) => isLowStock(m, thresholds));
+    case "exhausted":
+      return active.filter((m) => isExhausted(m, thresholds));
+  }
+}
+
+export function filterMedicationsByPerson(medications: Medication[], person: string): Medication[] {
+  return medications.filter((m) => m.status === "active" && m.tags.includes(person));
+}

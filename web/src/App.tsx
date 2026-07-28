@@ -7,6 +7,7 @@ import { InventorySessionsListPage } from "./pages/InventorySessionsListPage";
 import { InventorySessionWizardPage } from "./pages/InventorySessionWizardPage";
 import { MedicationFormPage } from "./pages/MedicationFormPage";
 import { MedicationsListPage } from "./pages/MedicationsListPage";
+import { StatisticsDetailPage } from "./pages/StatisticsDetailPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 import { LoginPage } from "./pages/LoginPage";
 
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="inventario" element={<InventorySessionsListPage />} />
         <Route path="inventario/:sessionId" element={<InventorySessionWizardPage />} />
         <Route path="statistiche" element={<StatisticsPage />} />
+        <Route path="statistiche/dettaglio" element={<StatisticsDetailPage />} />
         <Route path="guida" element={<HelpPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
