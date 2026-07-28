@@ -17,6 +17,7 @@ service cloud.firestore {
         && data.activeIngredient is string
         && data.indication is string
         && data.requiresPrescription is bool
+        && data.requiresRefrigeration is bool
         && data.tags is list
         && data.quantityPercent is number
         && data.quantityPercent >= 0 && data.quantityPercent <= 100

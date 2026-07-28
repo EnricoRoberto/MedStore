@@ -37,6 +37,8 @@ const sections: Section[] = [
     body: [
       "Ogni farmaco ha una quantità indicativa da 0% a 100%, mostrata con una barra colorata (verde, giallo sotto il 20%, rosso sotto il 5%) e modificabile manualmente in qualsiasi momento.",
       "Usa la barra di ricerca nella schermata principale per trovare rapidamente un farmaco per nome, produttore, principio attivo o tag, e verificarne la giacenza.",
+      "La spunta \"Raggruppa per uso\" trasforma l'elenco in gruppi collassabili in base alla destinazione d'uso di ciascun farmaco (es. \"mal di testa\"): ogni gruppo mostra quanti farmaci contiene e si apre toccandolo. La scelta resta ricordata da una visita all'altra. Mentre cerchi qualcosa, l'elenco torna comunque piatto per non doverlo cercare dentro i gruppi.",
+      "Se un farmaco va conservato in frigorifero, spunta \"Da conservare in frigorifero\" nella sua scheda: comparirà l'icona 🌡️❄️ accanto al nome nell'elenco.",
     ],
   },
   {

@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { QuantityBar } from "../components/QuantityBar";
+import { MedicationListItem } from "../components/MedicationListItem";
 import { deleteAllMedications, useMedications } from "../lib/medications";
-import { getMedicationBadge } from "../lib/medicationStatus";
 import { useNotificationThresholds } from "../lib/notificationThresholds";
 import type { Medication } from "../types/medication";
+
+const GROUPED_VIEW_KEY = "medstore-medications-grouped";
+const UNSPECIFIED_GROUP = "Uso non specificato";
 
 function matchesSearch(medication: Medication, term: string): boolean {
   if (!term) return true;
@@ -20,17 +22,45 @@ function matchesSearch(medication: Medication, term: string): boolean {
   return haystack.includes(term.toLowerCase());
 }
 
+function groupByIndication(medications: Medication[]): [string, Medication[]][] {
+  const groups = new Map<string, Medication[]>();
+  for (const medication of medications) {
+    const key = medication.indication.trim() || UNSPECIFIED_GROUP;
+    const list = groups.get(key);
+    if (list) {
+      list.push(medication);
+    } else {
+      groups.set(key, [medication]);
+    }
+  }
+  return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b));
+}
+
 export function MedicationsListPage() {
   const medications = useMedications();
   const thresholds = useNotificationThresholds();
   const [search, setSearch] = useState("");
   const [clearing, setClearing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [grouped, setGrouped] = useState(() => localStorage.getItem(GROUPED_VIEW_KEY) === "1");
 
   const filtered = useMemo(() => {
     if (!medications) return [];
     return medications.filter((medication) => matchesSearch(medication, search));
   }, [medications, search]);
+
+  // Mentre si cerca, ha senso vedere subito l'elenco piatto dei risultati
+  // invece di doverli scovare aprendo i gruppi uno per uno.
+  const showGrouped = grouped && !search;
+  const groups = useMemo(
+    () => (showGrouped ? groupByIndication(filtered) : []),
+    [showGrouped, filtered],
+  );
+
+  function handleToggleGrouped(next: boolean) {
+    setGrouped(next);
+    localStorage.setItem(GROUPED_VIEW_KEY, next ? "1" : "0");
+  }
 
   async function handleClearAll() {
     if (!medications || medications.length === 0) return;
@@ -82,6 +112,16 @@ export function MedicationsListPage() {
         </div>
       </div>
 
+      <label className="flex items-center gap-2 text-sm text-stone-600">
+        <input
+          type="checkbox"
+          checked={grouped}
+          onChange={(e) => handleToggleGrouped(e.target.checked)}
+          className="h-4 w-4 rounded border-stone-300"
+        />
+        Raggruppa per uso (collassabile)
+      </label>
+
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {medications === null && <p className="text-sm text-stone-500">Caricamento…</p>}
@@ -94,51 +134,36 @@ export function MedicationsListPage() {
         </p>
       )}
 
-      <ul className="space-y-2">
-        {filtered.map((medication) => {
-          const badge =
-            medication.status === "active" ? getMedicationBadge(medication, thresholds) : null;
-          return (
-            <li key={medication.id}>
-              <Link
-                to={`/farmaci/${medication.id}`}
-                className="block rounded-2xl border border-stone-300 bg-white p-4 shadow-sm hover:border-terracotta-300 hover:shadow-md"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-medium text-stone-800">
-                      {medication.name}
-                      {medication.status === "archived" && (
-                        <span className="ml-2 rounded bg-stone-100 px-1.5 py-0.5 text-xs font-normal text-stone-500">
-                          Archiviato
-                        </span>
-                      )}
-                      {badge && (
-                        <span
-                          className={`ml-2 rounded-full px-1.5 py-0.5 text-xs font-medium ${
-                            badge.tone === "red"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-amber-100 text-amber-800"
-                          }`}
-                        >
-                          {badge.label}
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-sm text-stone-500">
-                      {medication.producer || "Produttore sconosciuto"}
-                      {medication.tags.length > 0 && ` · ${medication.tags.join(", ")}`}
-                    </p>
-                  </div>
-                  <div className="w-32 shrink-0">
-                    <QuantityBar percent={medication.quantityPercent} />
-                  </div>
-                </div>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      {!showGrouped && (
+        <ul className="space-y-2">
+          {filtered.map((medication) => (
+            <MedicationListItem key={medication.id} medication={medication} thresholds={thresholds} />
+          ))}
+        </ul>
+      )}
+
+      {showGrouped && (
+        <div className="space-y-3">
+          {groups.map(([group, items]) => (
+            <details key={group} className="group rounded-2xl border-2 border-stone-400 bg-white shadow-md">
+              <summary className="cursor-pointer select-none list-none px-4 py-3 font-medium text-stone-800 marker:content-none">
+                <span className="mr-2 inline-block transition-transform group-open:rotate-90">▶</span>
+                {group}
+                <span className="ml-2 text-sm font-normal text-stone-500">({items.length})</span>
+              </summary>
+              <ul className="space-y-2 border-t border-stone-200 p-3">
+                {items.map((medication) => (
+                  <MedicationListItem
+                    key={medication.id}
+                    medication={medication}
+                    thresholds={thresholds}
+                  />
+                ))}
+              </ul>
+            </details>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

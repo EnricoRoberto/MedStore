@@ -161,6 +161,7 @@ export async function classifyPhotosWithAi(sessionId: string): Promise<number> {
         activeIngredient: box.activeIngredient ?? "",
         indication: box.indication ?? "",
         requiresPrescription: box.requiresPrescription ?? false,
+        requiresRefrigeration: false,
         tags: [],
         quantityPercent: 100,
         minQuantityPercent: null,

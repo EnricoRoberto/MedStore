@@ -71,6 +71,15 @@ export function MedicationFields({
           />
           <span className="font-medium text-stone-700">Richiede ricetta medica</span>
         </label>
+        <label className="flex items-center gap-2 self-end text-sm">
+          <input
+            type="checkbox"
+            checked={values.requiresRefrigeration}
+            onChange={(e) => onChange({ ...values, requiresRefrigeration: e.target.checked })}
+            className="h-4 w-4 rounded border-stone-300"
+          />
+          <span className="font-medium text-stone-700">🌡️❄️ Da conservare in frigorifero</span>
+        </label>
       </div>
 
       <label className="block text-sm">

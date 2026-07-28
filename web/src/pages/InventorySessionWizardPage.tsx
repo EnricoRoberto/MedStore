@@ -29,6 +29,7 @@ const emptyClassification: MedicationFormValues = {
   activeIngredient: "",
   indication: "",
   requiresPrescription: false,
+  requiresRefrigeration: false,
   tags: [],
   quantityPercent: 100,
   minQuantityPercent: null,
@@ -122,7 +123,7 @@ export function InventorySessionWizardPage() {
           {boxes.map((box) => (
             <li
               key={box.id}
-              className="flex items-center justify-between gap-4 rounded-2xl border border-stone-300 bg-white p-4 shadow-sm"
+              className="flex items-center justify-between gap-4 rounded-2xl border-2 border-stone-400 bg-white p-4 shadow-md"
             >
               <div>
                 <p className="font-medium text-stone-800">
@@ -413,7 +414,7 @@ export function InventorySessionWizardPage() {
           {boxes.map((box) => {
             const isDone = box.status === "confirmed" || box.status === "merged_into_existing";
             return (
-              <li key={box.id} className="rounded-2xl border border-stone-300 bg-white p-4 shadow-sm">
+              <li key={box.id} className="rounded-2xl border-2 border-stone-400 bg-white p-4 shadow-md">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="font-medium text-stone-800">
