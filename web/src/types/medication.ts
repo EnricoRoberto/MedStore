@@ -9,6 +9,7 @@ export interface Medication {
   activeIngredient: string;
   indication: string;
   requiresPrescription: boolean;
+  requiresRefrigeration: boolean;
   tags: string[];
   quantityPercent: number;
   minQuantityPercent: number | null;
@@ -25,6 +26,7 @@ export interface MedicationFormValues {
   activeIngredient: string;
   indication: string;
   requiresPrescription: boolean;
+  requiresRefrigeration: boolean;
   tags: string[];
   quantityPercent: number;
   minQuantityPercent: number | null;
