@@ -103,7 +103,7 @@ export function InventorySessionsListPage() {
           return (
             <li
               key={session.id}
-              className="flex items-center gap-2 rounded-2xl border border-stone-200 bg-white p-4 hover:border-terracotta-300 hover:shadow-sm"
+              className="flex items-center gap-2 rounded-2xl border border-stone-300 bg-white p-4 shadow-sm hover:border-terracotta-300 hover:shadow-md"
             >
               <Link to={`/inventario/${session.id}`} className="flex flex-1 items-center justify-between gap-3">
                 <span className="text-sm text-stone-700">{label}</span>

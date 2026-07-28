@@ -122,7 +122,7 @@ export function InventorySessionWizardPage() {
           {boxes.map((box) => (
             <li
               key={box.id}
-              className="flex items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-white p-4"
+              className="flex items-center justify-between gap-4 rounded-2xl border border-stone-300 bg-white p-4 shadow-sm"
             >
               <div>
                 <p className="font-medium text-stone-800">
@@ -249,7 +249,6 @@ export function InventorySessionWizardPage() {
     setError(null);
     try {
       await classifyBox(sessionId, activeBoxId, draft);
-      setActiveBoxId(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Salvataggio non riuscito.");
     } finally {
@@ -263,6 +262,7 @@ export function InventorySessionWizardPage() {
     setError(null);
     try {
       await confirmBoxAsNewMedication(sessionId, box, editorLabel, boxPhotos(box, photos));
+      setActiveBoxId(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Conferma non riuscita.");
     } finally {
@@ -282,6 +282,7 @@ export function InventorySessionWizardPage() {
         editorLabel,
         boxPhotos(box, photos),
       );
+      setActiveBoxId(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Conferma non riuscita.");
     } finally {
@@ -412,7 +413,7 @@ export function InventorySessionWizardPage() {
           {boxes.map((box) => {
             const isDone = box.status === "confirmed" || box.status === "merged_into_existing";
             return (
-              <li key={box.id} className="rounded-2xl border border-stone-200 p-4">
+              <li key={box.id} className="rounded-2xl border border-stone-300 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="font-medium text-stone-800">
@@ -430,10 +431,10 @@ export function InventorySessionWizardPage() {
                         onClick={() => openClassification(box)}
                         className="rounded-xl border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-100"
                       >
-                        {box.classification ? "Modifica classificazione" : "Classifica"}
+                        Rivedi/Modifica
                       </button>
                     )}
-                    {box.status === "classified" && (
+                    {box.status === "classified" && activeBoxId !== box.id && (
                       <BoxConfirmActions
                         medications={medications ?? []}
                         onConfirmNew={() => void handleConfirmNew(box)}
@@ -489,9 +490,23 @@ export function InventorySessionWizardPage() {
                         onClick={() => setActiveBoxId(null)}
                         className="rounded-xl border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-100"
                       >
-                        Annulla
+                        Chiudi
                       </button>
                     </div>
+                    {box.status === "classified" && (
+                      <div className="border-t border-terracotta-200 pt-3">
+                        <p className="mb-2 text-xs font-medium text-stone-600">
+                          Classificazione salvata: conferma quando sei pronto.
+                        </p>
+                        <BoxConfirmActions
+                          medications={medications ?? []}
+                          onConfirmNew={() => void handleConfirmNew(box)}
+                          onConfirmExisting={(medicationId) =>
+                            void handleConfirmExisting(box, medicationId)
+                          }
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </li>
