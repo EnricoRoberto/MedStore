@@ -69,6 +69,7 @@ const sections: Section[] = [
     title: "Statistiche",
     body: [
       "La pagina Statistiche riassume l'inventario: numero di farmaci in uso e archiviati, da banco vs con ricetta, in scadenza o scaduti, con scorta bassa o esauriti, sessioni di inventario completate e quanti farmaci usa ciascuna persona.",
+      "Ogni riquadro è cliccabile: si apre una paginetta con l'elenco esatto dei farmaci che concorrono a quel numero (es. i 5 farmaci esauriti), da cui puoi entrare nella scheda di ciascuno. Il pulsante \"← Torna alle statistiche\" riporta sempre alla pagina Statistiche, indipendentemente da come sei arrivato al dettaglio.",
       "In fondo alla pagina puoi condividere un report testuale dell'inventario attivo (nome, riempimento, scadenza e uso di ogni farmaco): \"Condividi\" apre il pannello di condivisione dello smartphone (WhatsApp, Messaggi, email, ecc.), oppure \"Invia via email\" apre direttamente un nuovo messaggio nel tuo client di posta.",
     ],
   },
