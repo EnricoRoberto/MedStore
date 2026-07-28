@@ -102,7 +102,7 @@ export function MedicationsListPage() {
             <li key={medication.id}>
               <Link
                 to={`/farmaci/${medication.id}`}
-                className="block rounded-2xl border border-stone-200 bg-white p-4 hover:border-terracotta-300 hover:shadow-sm"
+                className="block rounded-2xl border border-stone-300 bg-white p-4 shadow-sm hover:border-terracotta-300 hover:shadow-md"
               >
                 <div className="flex items-center justify-between gap-4">
                   <div>
